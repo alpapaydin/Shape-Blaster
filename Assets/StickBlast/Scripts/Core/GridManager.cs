@@ -1,0 +1,451 @@
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+using StickBlast.Sticks;
+using System.Linq;
+
+public class GridManager : MonoBehaviour
+{
+    [SerializeField] private int width = 6;
+    [SerializeField] private int height = 4;
+    [SerializeField] private GameObject dotPrefab;
+    [SerializeField] private GameObject connectionPrefab;
+    [SerializeField] private GameObject cellPrefab;
+    [SerializeField] private LayoutManager layoutManager;
+    [SerializeField] private Color highlightColor = Color.yellow;
+    [SerializeField] private Color themeColor = Color.green;
+    [SerializeField] private Color emptyColor = Color.blue;
+    private Dot[,] dots;
+    private Connection[,] horizontalConnections;
+    private Connection[,] verticalConnections;
+    private Cell[,] cells;
+    
+    void Start()
+    {
+        InitializeGrid();
+    }
+
+    private void OnRectTransformDimensionsChange()
+    {
+        UpdateGridTransform();
+    }
+
+    private void UpdateGridTransform()
+    {
+        if (layoutManager != null)
+        {
+            float gridScale = layoutManager.GetGridScale(width, height);
+            Vector3 gridPosition = layoutManager.GetGridPosition(width, height);
+            transform.position = gridPosition;
+            transform.localScale = Vector3.one * gridScale;
+
+            UpdateConnectionWidths(gridScale);
+        }
+    }
+
+    private void UpdateConnectionWidths(float scale)
+    {
+        for (int x = 0; x < width; x++)
+        {
+            for (int y = 0; y < height - 1; y++)
+            {
+                if (horizontalConnections[x, y] != null)
+                {
+                    horizontalConnections[x, y].UpdateWidth(scale);
+                }
+            }
+        }
+
+        for (int x = 0; x < width - 1; x++)
+        {
+            for (int y = 0; y < height; y++)
+            {
+                if (verticalConnections[x, y] != null)
+                {
+                    verticalConnections[x, y].UpdateWidth(scale);
+                }
+            }
+        }
+    }
+
+    private void InitializeGrid()
+    {
+        dots = new Dot[width, height];
+        horizontalConnections = new Connection[width, height - 1];
+        verticalConnections = new Connection[width - 1, height];
+    
+        float offsetX = -(width - 1) * 0.5f;
+        float offsetY = -(height - 1) * 0.5f;
+
+        for (int x = 0; x < width; x++)
+        {
+            for (int y = 0; y < height; y++)
+            {
+                Vector3 position = new Vector3(x + offsetX, y + offsetY, 0);
+                GameObject dotObj = Instantiate(dotPrefab, position, Quaternion.identity, transform);
+                dots[x, y] = dotObj.GetComponent<Dot>();
+                dots[x, y].Initialize(new Vector2Int(x, y));
+                dots[x, y].SetBaseColor(emptyColor);
+            }
+        }
+
+        for (int x = 0; x < width; x++)
+        {
+            for (int y = 0; y < height - 1; y++)
+            {
+                Vector3 position = new Vector3(x + offsetX, y + 0.5f + offsetY, 0);
+                GameObject connObj = Instantiate(connectionPrefab, position, Quaternion.identity, transform);
+                horizontalConnections[x, y] = connObj.GetComponent<Connection>();
+                horizontalConnections[x, y].Initialize(dots[x, y], dots[x, y + 1]);
+                horizontalConnections[x, y].SetColors(emptyColor, themeColor);
+            }
+        }
+
+        for (int x = 0; x < width - 1; x++)
+        {
+            for (int y = 0; y < height; y++)
+            {
+                Vector3 position = new Vector3(x + 0.5f + offsetX, y + offsetY, 0);
+                GameObject connObj = Instantiate(connectionPrefab, position, Quaternion.identity, transform);
+                verticalConnections[x, y] = connObj.GetComponent<Connection>();
+                verticalConnections[x, y].Initialize(dots[x, y], dots[x + 1, y]);
+                verticalConnections[x, y].SetColors(emptyColor, themeColor);
+            }
+        }
+
+        cells = new Cell[width - 1, height - 1];
+        for (int x = 0; x < width - 1; x++)
+        {
+            for (int y = 0; y < height - 1; y++)
+            {
+                Vector3 position = new Vector3(x + 0.5f + offsetX, y + 0.5f + offsetY, 0);
+                GameObject cellObj = Instantiate(cellPrefab, position, Quaternion.identity, transform);
+                cells[x, y] = cellObj.GetComponent<Cell>();
+            }
+        }
+
+        UpdateGridTransform();
+
+    }
+
+
+    private bool IsValidConnection(Vector2Int start, Vector2Int end)
+    {
+        if (start.x < 0 || start.x >= width || start.y < 0 || start.y >= height ||
+            end.x < 0 || end.x >= width || end.y < 0 || end.y >= height)
+            return false;
+
+        return (Mathf.Abs(start.x - end.x) == 1 && start.y == end.y) ||
+               (Mathf.Abs(start.y - end.y) == 1 && start.x == end.x);
+    }
+
+    private Connection GetConnection(Vector2Int start, Vector2Int end)
+    {
+        if (start.x == end.x)
+        {
+            int minY = Mathf.Min(start.y, end.y);
+            return horizontalConnections[start.x, minY];
+        }
+        else
+        {
+            int minX = Mathf.Min(start.x, end.x);
+            return verticalConnections[minX, start.y];
+        }
+    }
+
+    private void CheckForCompletedCells(Vector2Int start, Vector2Int end)
+    {
+        Vector2Int[] cellPositions = GetAdjacentCellPositions(start, end);
+        
+        foreach (Vector2Int cellPos in cellPositions)
+        {
+            if (IsCellWithinBounds(cellPos) && !cells[cellPos.x, cellPos.y].IsComplete())
+            {
+                CheckAndCompleteCell(cellPos);
+            }
+        }
+    }
+
+    private Vector2Int[] GetAdjacentCellPositions(Vector2Int start, Vector2Int end)
+    {
+        if (start.x == end.x)
+        {
+            int x = start.x - 1;
+            int y = Mathf.Min(start.y, end.y);
+            return new Vector2Int[] 
+            { 
+                new Vector2Int(x, y),
+                new Vector2Int(x + 1, y)
+            };
+        }
+        else
+        {
+            int x = Mathf.Min(start.x, end.x);
+            int y = start.y - 1;
+            return new Vector2Int[] 
+            { 
+                new Vector2Int(x, y),
+                new Vector2Int(x, y + 1)
+            };
+        }
+    }
+
+    private bool IsCellWithinBounds(Vector2Int pos)
+    {
+        return pos.x >= 0 && pos.x < width - 1 && 
+               pos.y >= 0 && pos.y < height - 1;
+    }
+
+    private Connection[] GetCellConnections(Vector2Int cellPos)
+    {
+        return new Connection[]
+        {
+            verticalConnections[cellPos.x, cellPos.y],
+            horizontalConnections[cellPos.x + 1, cellPos.y],
+            verticalConnections[cellPos.x, cellPos.y + 1],
+            horizontalConnections[cellPos.x, cellPos.y]
+        };
+    }
+
+    private void CheckAndCompleteCell(Vector2Int cellPos)
+    {
+        Connection[] cellConnections = GetCellConnections(cellPos);
+
+        bool isComplete = cellConnections.All(conn => conn != null && conn.IsOccupied);
+
+        if (isComplete)
+        {
+            cells[cellPos.x, cellPos.y].SetComplete(themeColor);
+            CheckForBlast();
+        }
+    }
+
+    private void CheckForBlast()
+    {
+        for (int y = 0; y < height - 1; y++)
+        {
+            bool rowComplete = true;
+            for (int x = 0; x < width - 1; x++)
+            {
+                if (!cells[x, y].IsComplete())
+                {
+                    rowComplete = false;
+                    break;
+                }
+            }
+            if (rowComplete)
+            {
+                BlastRow(y);
+            }
+        }
+
+        for (int x = 0; x < width - 1; x++)
+        {
+            bool columnComplete = true;
+            for (int y = 0; y < height - 1; y++)
+            {
+                if (!cells[x, y].IsComplete())
+                {
+                    columnComplete = false;
+                    break;
+                }
+            }
+            if (columnComplete)
+            {
+                BlastColumn(x);
+            }
+        }
+    }
+
+    private void BlastRow(int row)
+    {
+        for (int x = 0; x < width - 1; x++)
+        {
+            cells[x, row].Reset();
+
+            ResetCellConnections(new Vector2Int(x, row));
+        }
+    }
+
+    private void BlastColumn(int column)
+    {
+        for (int y = 0; y < height - 1; y++)
+        {
+            cells[column, y].Reset();
+
+            ResetCellConnections(new Vector2Int(column, y));
+        }
+    }
+
+    private bool DotHasOccupiedConnections(int x, int y)
+    {
+        if (x > 0 && verticalConnections[x-1, y] != null && verticalConnections[x-1, y].IsOccupied) return true;
+        if (x < width-1 && verticalConnections[x, y] != null && verticalConnections[x, y].IsOccupied) return true;
+        
+        if (y > 0 && horizontalConnections[x, y-1] != null && horizontalConnections[x, y-1].IsOccupied) return true;
+        if (y < height-1 && horizontalConnections[x, y] != null && horizontalConnections[x, y].IsOccupied) return true;
+
+        return false;
+    }
+
+    private void ResetCellConnections(Vector2Int cellPos)
+    {
+        Connection[] connections = GetCellConnections(cellPos);
+        foreach (var conn in connections)
+        {
+            if (conn != null)
+            {
+                conn.Reset();
+
+                Dot startDot = conn.StartDot;
+                Dot endDot = conn.EndDot;
+
+                if (!DotHasOccupiedConnections(startDot.GridPosition.x, startDot.GridPosition.y))
+                {
+                    startDot.SetBaseColor(emptyColor);
+                    startDot.SetOccupied(false);
+                }
+
+                if (!DotHasOccupiedConnections(endDot.GridPosition.x, endDot.GridPosition.y))
+                {
+                    endDot.SetBaseColor(emptyColor);
+                    endDot.SetOccupied(false);
+                }
+            }
+        }
+    }
+
+    public float GetWorldWidth() => width - 1;
+    public float GetWorldHeight() => height - 1;
+
+    public Vector2Int WorldToGridPosition(Vector2 worldPosition)
+    {
+        Vector3 localPos = transform.InverseTransformPoint(worldPosition);
+        return new Vector2Int(
+            Mathf.RoundToInt(localPos.x + (width - 1) * 0.5f),
+            Mathf.RoundToInt(localPos.y + (height - 1) * 0.5f)
+        );
+    }
+
+    public void HighlightPotentialPlacement(Vector2Int origin, StickData stick)
+    {
+        ClearHighlights();
+        
+        if (!CanPlaceStick(origin, stick)) return;
+
+        foreach (var segment in stick.segments)
+        {
+            Vector2Int start = origin + segment.start;
+            Vector2Int end = origin + segment.end;
+            
+            if (IsValidGridPosition(start) && IsValidGridPosition(end))
+            {
+                dots[start.x, start.y].Highlight(highlightColor);
+                dots[end.x, end.y].Highlight(highlightColor);
+                
+                Connection conn = GetConnection(start, end);
+                if (conn != null && !conn.IsOccupied)
+                {
+                    conn.Highlight(highlightColor);
+                }
+            }
+        }
+    }
+
+    public void ClearHighlights()
+    {
+        for (int x = 0; x < width; x++)
+        {
+            for (int y = 0; y < height; y++)
+            {
+                dots[x, y].ClearHighlight();
+            }
+        }
+
+        for (int x = 0; x < width; x++)
+        {
+            for (int y = 0; y < height - 1; y++)
+            {
+                if (horizontalConnections[x, y] != null)
+                {
+                    horizontalConnections[x, y].SetColors(emptyColor, themeColor);
+                }
+            }
+        }
+
+        for (int x = 0; x < width - 1; x++)
+        {
+            for (int y = 0; y < height; y++)
+            {
+                if (verticalConnections[x, y] != null)
+                {
+                    verticalConnections[x, y].SetColors(emptyColor, themeColor);
+                }
+            }
+        }
+    }
+
+    public bool CanPlaceStick(Vector2Int origin, StickData stick)
+    {
+        if (!IsValidPlacement(origin, stick)) return false;
+
+        foreach (var segment in stick.segments)
+        {
+            Vector2Int start = origin + segment.start;
+            Vector2Int end = origin + segment.end;
+            
+            Connection conn = GetConnection(start, end);
+            if (conn == null || conn.IsOccupied) return false;
+        }
+
+        return true;
+    }
+
+    public bool PlaceStick(Vector2Int origin, StickData stick)
+    {
+        if (!CanPlaceStick(origin, stick)) return false;
+
+        foreach (var segment in stick.segments)
+        {
+            Vector2Int start = origin + segment.start;
+            Vector2Int end = origin + segment.end;
+            
+            Connection conn = GetConnection(start, end);
+            if (conn != null)
+            {
+                conn.Occupy();
+                dots[start.x, start.y].SetBaseColor(themeColor);
+                dots[start.x, start.y].SetOccupied(true);
+                dots[end.x, end.y].SetBaseColor(themeColor);
+                dots[end.x, end.y].SetOccupied(true);
+
+                CheckForCompletedCells(start, end);
+            }
+        }
+
+        return true;
+    }
+
+    private bool IsValidPlacement(Vector2Int origin, StickData stick)
+    {
+        foreach (var segment in stick.segments)
+        {
+            Vector2Int start = origin + segment.start;
+            Vector2Int end = origin + segment.end;
+            
+            if (!IsValidGridPosition(start) || !IsValidGridPosition(end)) return false;
+            if (!IsValidConnection(start, end)) return false;
+        }
+        return true;
+    }
+
+    private bool IsValidGridPosition(Vector2Int pos)
+    {
+        return pos.x >= 0 && pos.x < width && pos.y >= 0 && pos.y < height;
+    }
+
+    public Color GetThemeColor()
+    {
+        return themeColor;
+    }
+}
