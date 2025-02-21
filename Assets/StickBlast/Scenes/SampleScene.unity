@@ -220,6 +220,7 @@ MonoBehaviour:
   availableSticks:
   - {fileID: 11400000, guid: 7130d9c07acd4b146a5be71e0a427b06, type: 2}
   - {fileID: 11400000, guid: 522d8134b71cc954f9103d53645439ba, type: 2}
+  containerMargin: 20
 --- !u!1 &359570527
 GameObject:
   m_ObjectHideFlags: 0
