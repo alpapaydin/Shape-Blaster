@@ -11,7 +11,8 @@ public class StickSpawner : MonoBehaviour
     [SerializeField] private float paddingMultiplier = 1.2f;
     [SerializeField] private Canvas canvas;
     [SerializeField] private StickDefinition[] availableSticks;
-    [SerializeField] private float containerMargin = 20f; // Add margin configuration
+    [SerializeField] private float containerMargin = 20f;
+    [SerializeField] private float stickScale = 1f;
 
     private Vector2[] slotPositions;
     private bool[] occupiedSlots;
@@ -39,7 +40,7 @@ public class StickSpawner : MonoBehaviour
 
     private void CalculateSlotPositions()
     {
-        float maxWidth = StickDraggable.CalculateMaxWidth(availableSticks);
+        float maxWidth = StickDraggable.CalculateMaxWidth(availableSticks, stickScale);
         float spacing = Mathf.Max(minSpacing, maxWidth * paddingMultiplier);
         
         float totalWidth = spacing * (maxSticks - 1);
@@ -81,6 +82,7 @@ public class StickSpawner : MonoBehaviour
         rect.pivot = new Vector2(0.5f, 0.5f);
         
         StickDraggable dragHandler = stickUI.GetComponent<StickDraggable>();
+        dragHandler.visualScale = stickScale;
         dragHandler.Initialize(stickData);
         dragHandler.SetCanvas(canvas);
         dragHandler.SetSlotIndex(slotIndex);
@@ -104,9 +106,51 @@ public class StickSpawner : MonoBehaviour
         return StickData.Create(randomDef, randomOrientation);
     }
 
+    public bool IsGameOver()
+    {
+        var activeSticks = GetComponentsInChildren<StickDraggable>();
+        
+        foreach (var stickDraggable in activeSticks)
+        {
+            if (gridManager.CanStickBePlacedAnywhere(stickDraggable.StickData))
+            {
+                return false;
+            }
+        }
+        
+        return true;
+    }
+
+    private void CheckGameOver()
+    {
+        if (IsGameOver())
+        {
+            Debug.Log("Game Over - No valid moves left!");
+        }
+    }
+
     public void OnStickPlaced(int slotIndex)
     {
         occupiedSlots[slotIndex] = false;
         SpawnRandomStick();
+        CheckGameOver();
+    }
+
+    public void CheckGameOver(StickDraggable currentStick)
+    {
+        var activeSticks = GetComponentsInChildren<StickDraggable>();
+        
+        foreach (var stick in activeSticks)
+        {
+            if (stick == currentStick) continue;
+            
+            if (gridManager.CanStickBePlacedAnywhere(stick.StickData))
+            {
+                return;
+            }
+        }
+        
+        Debug.Log("Game Over - No valid moves left!");
+        // OnGameOver.Invoke();
     }
 }

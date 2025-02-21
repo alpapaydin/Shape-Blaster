@@ -262,8 +262,15 @@ public class GridManager : MonoBehaviour
         for (int x = 0; x < width - 1; x++)
         {
             cells[x, row].Reset();
-
             ResetCellConnections(new Vector2Int(x, row));
+        }
+        
+        for (int x = 0; x < width - 1; x++)
+        {
+            if (row > 0)
+                CheckAndResetIncompleteCell(new Vector2Int(x, row - 1));
+            if (row < height - 2)
+                CheckAndResetIncompleteCell(new Vector2Int(x, row + 1));
         }
     }
 
@@ -272,8 +279,29 @@ public class GridManager : MonoBehaviour
         for (int y = 0; y < height - 1; y++)
         {
             cells[column, y].Reset();
-
             ResetCellConnections(new Vector2Int(column, y));
+        }
+        
+        for (int y = 0; y < height - 1; y++)
+        {
+            if (column > 0)
+                CheckAndResetIncompleteCell(new Vector2Int(column - 1, y));
+            if (column < width - 2)
+                CheckAndResetIncompleteCell(new Vector2Int(column + 1, y));
+        }
+    }
+
+    private void CheckAndResetIncompleteCell(Vector2Int cellPos)
+    {
+        if (!cells[cellPos.x, cellPos.y].IsComplete())
+            return;
+
+        Connection[] cellConnections = GetCellConnections(cellPos);
+        bool isStillComplete = cellConnections.All(conn => conn != null && conn.IsOccupied);
+
+        if (!isStillComplete)
+        {
+            cells[cellPos.x, cellPos.y].Reset();
         }
     }
 
@@ -447,5 +475,40 @@ public class GridManager : MonoBehaviour
     public Color GetThemeColor()
     {
         return themeColor;
+    }
+
+    public bool CanStickBePlacedAnywhere(StickData stick)
+    {
+        Vector2Int min = Vector2Int.zero;
+        Vector2Int max = Vector2Int.zero;
+        
+        foreach (var segment in stick.segments)
+        {
+            min.x = Mathf.Min(min.x, Mathf.Min(segment.start.x, segment.end.x));
+            min.y = Mathf.Min(min.y, Mathf.Min(segment.start.y, segment.end.y));
+            max.x = Mathf.Max(max.x, Mathf.Max(segment.start.x, segment.end.x));
+            max.y = Mathf.Max(max.y, Mathf.Max(segment.start.y, segment.end.y));
+        }
+
+        int startX = Mathf.Max(0, -min.x);
+        int endX = Mathf.Min(width - 1, width - max.x);
+        int startY = Mathf.Max(0, -min.y);
+        int endY = Mathf.Min(height - 1, height - max.y);
+
+        if (startX > endX || startY > endY)
+            return false;
+
+        for (int x = startX; x <= endX; x++)
+        {
+            for (int y = startY; y <= endY; y++)
+            {
+                if (CanPlaceStick(new Vector2Int(x, y), stick))
+                {
+                    return true;
+                }
+            }
+        }
+
+        return false;
     }
 }
