@@ -694,6 +694,7 @@ MonoBehaviour:
   connectionPrefab: {fileID: 7036382262088913388, guid: 36c98d544489f7d479f784275cafcd69, type: 3}
   cellPrefab: {fileID: 2282444658204982986, guid: 058fc37fce1a6244699349523172da60, type: 3}
   layoutManager: {fileID: 1792620762}
+  mainCamera: {fileID: 519420031}
   highlightColor: {r: 0, g: 1, b: 0, a: 0.41568628}
   themeColor: {r: 0, g: 1, b: 0, a: 1}
   emptyColor: {r: 0, g: 0, b: 0.3301887, a: 1}

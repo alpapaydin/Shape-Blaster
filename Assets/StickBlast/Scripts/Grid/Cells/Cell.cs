@@ -5,6 +5,7 @@ public class Cell : MonoBehaviour
 {
     [SerializeField] private Material blastPreviewMaterialPrefab;
     [SerializeField] private Material blastInnerMaterialPrefab;
+    [SerializeField] private GameObject blastEffectPrefab;
     [SerializeField] private SpriteRenderer outerGlowRenderer;
     private SpriteRenderer mainRenderer;
     private bool isComplete;
@@ -15,9 +16,19 @@ public class Cell : MonoBehaviour
     [SerializeField] private float fillDuration = 0.5f;
     private Coroutine fillCoroutine;
     private Color currentColor;
+    private Color fillColor;
+    private Color blastColor;
 
     private void Awake()
     {
+        SetupRenderers();
+        InitializeMaterials();
+    }
+
+    public void Initialize(Color fillColor, Color blastColor)
+    {
+        this.fillColor = fillColor;
+        this.blastColor = blastColor;
         SetupRenderers();
         InitializeMaterials();
     }
@@ -75,10 +86,10 @@ public class Cell : MonoBehaviour
         }
     }
 
-    public void SetComplete(Color color, bool animate = false)
+    public void SetComplete(bool complete, bool animate = false)
     {
-        isComplete = true;
-        currentColor = color;
+        isComplete = complete;
+        currentColor = fillColor;
         SwapToFillMaterial();
         
         if (animate)
@@ -87,7 +98,7 @@ public class Cell : MonoBehaviour
         }
         else
         {
-            fillMaterial.SetFloat("_FillAmount", 1f);
+            fillMaterial.SetFloat("_FillAmount", complete ? 1f : 0f);
         }
     }
 
@@ -137,17 +148,17 @@ public class Cell : MonoBehaviour
         SwapToFillMaterial();
     }
 
-    public void ShowBlastPreview(Color color)
+    public void ShowBlastPreview()
     {
         if (outerGlowRenderer != null)
         {
             outerGlowRenderer.enabled = true;
-            glowMaterial.SetColor("_Color", new Color(color.r, color.g, color.b, 0.3f));
+            glowMaterial.SetColor("_Color", new Color(blastColor.r, blastColor.g, blastColor.b, 0.3f));
             glowMaterial.SetFloat("_FillAmount", 1);
         }
 
         mainRenderer.material = innerBlastMaterial;
-        innerBlastMaterial.SetColor("_Color", new Color(color.r, color.g, color.b, 0.7f));
+        innerBlastMaterial.SetColor("_Color", new Color(blastColor.r, blastColor.g, blastColor.b, 0.7f));
         innerBlastMaterial.SetFloat("_FillAmount", 1);
     }
 
@@ -155,6 +166,19 @@ public class Cell : MonoBehaviour
     {
         ResetGlowMaterial();
         SwapToFillMaterial();
+    }
+
+    public void ShowBlastVisual(bool isVertical, Vector3 scale)
+    {
+        if (blastEffectPrefab != null)
+        {
+            Vector3 position = transform.position;
+            position.z = -0.1f;
+
+            GameObject effect = Instantiate(blastEffectPrefab, position, Quaternion.identity);
+            effect.transform.localScale = Vector3.Scale(effect.transform.localScale, scale);
+            effect.GetComponent<BlastEffect>()?.SetDirection(isVertical);
+        }
     }
 
     private void OnDestroy()

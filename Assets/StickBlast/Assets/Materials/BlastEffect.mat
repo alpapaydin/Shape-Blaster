@@ -7,8 +7,8 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: CellBlastInner
-  m_Shader: {fileID: 4800000, guid: 4a93f3c69506ff14b83eb3c6abe54a1f, type: 3}
+  m_Name: BlastEffect
+  m_Shader: {fileID: 4800000, guid: 90a17eefee0bc1b44a94cc13b2109d17, type: 3}
   m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0
   m_ValidKeywords: []
@@ -41,14 +41,24 @@ Material:
         m_Offset: {x: 0, y: 0}
     m_Ints: []
     m_Floats:
-    - _EmissionIntensity: 1.365
+    - _BlastWidth: 0.755
+    - _CoreGlow: 0
+    - _DistortionStrength: 0.1339
+    - _EdgeSoftness: 0.016
     - _EnableExternalAlpha: 0
-    - _FillAmount: 0
-    - _PulseSpeed: 2.62
-    - _WaveScale: 7.37
-    - _WaveSpeed: 0.125
+    - _IsVertical: 0
+    - _LineExpansionSpeed: 1
+    - _MaxLineWidth: 0.428
+    - _NoiseScale: 9.29
+    - _ParticleCount: 30
+    - _ParticleSize: 0.0283
+    - _ParticleSpeed: 1.5
+    - _Progress: 0
+    - _ShockwaveCount: 1.96
+    - _ShockwaveIntensity: 1.559
+    - _ShockwaveWidth: 0.286
     m_Colors:
-    - _Color: {r: 1, g: 1, b: 0.43921566, a: 0.5019608}
+    - _Color: {r: 0.38484606, g: 0.9198113, b: 0.02169366, a: 1}
     - _Flip: {r: 1, g: 1, b: 1, a: 1}
     - _RendererColor: {r: 1, g: 1, b: 1, a: 1}
   m_BuildTextureStacks: []
