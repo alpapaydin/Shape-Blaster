@@ -20,3 +20,4 @@ MonoBehaviour:
   stickParts:
   - sprite: {fileID: 21300000, guid: 2d52cf4ba9c07f54fa199ad725de88b5, type: 3}
     relativePosition: {x: 0, y: 0}
+  scaleMultiplier: 5

@@ -27,4 +27,5 @@ MonoBehaviour:
   - sprite: {fileID: 21300000, guid: 67b8151f8eacafe49aea52ef1d7c3e6e, type: 3}
     relativePosition: {x: 0, y: -580}
   - sprite: {fileID: 21300000, guid: 9584d58b58711d5438236d6aa4cbf7c8, type: 3}
-    relativePosition: {x: 0, y: -580}
+    relativePosition: {x: 237, y: -780}
+  scaleMultiplier: 2.5

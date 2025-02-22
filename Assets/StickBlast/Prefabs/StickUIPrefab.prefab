@@ -58,6 +58,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   canvas: {fileID: 0}
-  dragOffset: 200
-  visualScale: 1
-  debugOrigin: 1
+  dragOffset: 100
+  previewScaleMultiplier: 0.1
+  dragScaleMultiplier: 0.1

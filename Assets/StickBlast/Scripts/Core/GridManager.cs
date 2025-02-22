@@ -19,7 +19,9 @@ public class GridManager : MonoBehaviour
     private Connection[,] horizontalConnections;
     private Connection[,] verticalConnections;
     private Cell[,] cells;
-    
+    private float currentScale = 1f;
+    private HashSet<Vector2Int> currentBlastPreviewCells = new HashSet<Vector2Int>();
+
     void Start()
     {
         InitializeGrid();
@@ -38,10 +40,12 @@ public class GridManager : MonoBehaviour
             Vector3 gridPosition = layoutManager.GetGridPosition(width, height);
             transform.position = gridPosition;
             transform.localScale = Vector3.one * gridScale;
-
+            currentScale = gridScale;
             UpdateConnectionWidths(gridScale);
         }
     }
+
+    public float GetCurrentScale() => currentScale;
 
     private void UpdateConnectionWidths(float scale)
     {
@@ -73,7 +77,7 @@ public class GridManager : MonoBehaviour
         dots = new Dot[width, height];
         horizontalConnections = new Connection[width, height - 1];
         verticalConnections = new Connection[width - 1, height];
-    
+
         float offsetX = -(width - 1) * 0.5f;
         float offsetY = -(height - 1) * 0.5f;
 
@@ -156,7 +160,7 @@ public class GridManager : MonoBehaviour
     private void CheckForCompletedCells(Vector2Int start, Vector2Int end)
     {
         Vector2Int[] cellPositions = GetAdjacentCellPositions(start, end);
-        
+
         foreach (Vector2Int cellPos in cellPositions)
         {
             if (IsCellWithinBounds(cellPos) && !cells[cellPos.x, cellPos.y].IsComplete())
@@ -172,8 +176,8 @@ public class GridManager : MonoBehaviour
         {
             int x = start.x - 1;
             int y = Mathf.Min(start.y, end.y);
-            return new Vector2Int[] 
-            { 
+            return new Vector2Int[]
+            {
                 new Vector2Int(x, y),
                 new Vector2Int(x + 1, y)
             };
@@ -182,8 +186,8 @@ public class GridManager : MonoBehaviour
         {
             int x = Mathf.Min(start.x, end.x);
             int y = start.y - 1;
-            return new Vector2Int[] 
-            { 
+            return new Vector2Int[]
+            {
                 new Vector2Int(x, y),
                 new Vector2Int(x, y + 1)
             };
@@ -192,7 +196,7 @@ public class GridManager : MonoBehaviour
 
     private bool IsCellWithinBounds(Vector2Int pos)
     {
-        return pos.x >= 0 && pos.x < width - 1 && 
+        return pos.x >= 0 && pos.x < width - 1 &&
                pos.y >= 0 && pos.y < height - 1;
     }
 
@@ -264,7 +268,7 @@ public class GridManager : MonoBehaviour
             cells[x, row].Reset();
             ResetCellConnections(new Vector2Int(x, row));
         }
-        
+
         for (int x = 0; x < width - 1; x++)
         {
             if (row > 0)
@@ -281,7 +285,7 @@ public class GridManager : MonoBehaviour
             cells[column, y].Reset();
             ResetCellConnections(new Vector2Int(column, y));
         }
-        
+
         for (int y = 0; y < height - 1; y++)
         {
             if (column > 0)
@@ -309,7 +313,7 @@ public class GridManager : MonoBehaviour
     {
         if (x > 0 && verticalConnections[x-1, y] != null && verticalConnections[x-1, y].IsOccupied) return true;
         if (x < width-1 && verticalConnections[x, y] != null && verticalConnections[x, y].IsOccupied) return true;
-        
+
         if (y > 0 && horizontalConnections[x, y-1] != null && horizontalConnections[x, y-1].IsOccupied) return true;
         if (y < height-1 && horizontalConnections[x, y] != null && horizontalConnections[x, y].IsOccupied) return true;
 
@@ -358,26 +362,54 @@ public class GridManager : MonoBehaviour
     public void HighlightPotentialPlacement(Vector2Int origin, StickData stick)
     {
         ClearHighlights();
-        
+
         if (!CanPlaceStick(origin, stick)) return;
 
+        Vector2 centerOffset = CalculateStickCenterOffset(stick);
         foreach (var segment in stick.segments)
         {
-            Vector2Int start = origin + segment.start;
-            Vector2Int end = origin + segment.end;
-            
+            Vector2Int start = origin + segment.start - Vector2Int.RoundToInt(centerOffset);
+            Vector2Int end = origin + segment.end - Vector2Int.RoundToInt(centerOffset);
+
             if (IsValidGridPosition(start) && IsValidGridPosition(end))
             {
-                dots[start.x, start.y].Highlight(highlightColor);
-                dots[end.x, end.y].Highlight(highlightColor);
-                
-                Connection conn = GetConnection(start, end);
-                if (conn != null && !conn.IsOccupied)
+                if (IsValidConnection(start, end))
                 {
-                    conn.Highlight(highlightColor);
+                    Connection conn = GetConnection(start, end);
+                    if (conn != null && !conn.IsOccupied)
+                    {
+                        dots[start.x, start.y].Highlight(highlightColor);
+                        dots[end.x, end.y].Highlight(highlightColor);
+                        conn.Highlight(highlightColor);
+                    }
                 }
             }
         }
+
+        var completedCells = SimulatePlacement(origin, stick);
+        if (completedCells.Count > 0)
+        {
+            //cell completion preview
+            var blastCells = CheckPotentialBlast(completedCells);
+            if (blastCells.Count > 0)
+            {
+                foreach (var cellPos in blastCells)
+                {
+                    cells[cellPos.x, cellPos.y].ShowBlastPreview(themeColor);
+                    currentBlastPreviewCells.Add(cellPos);
+                }
+            }
+        }
+    }
+
+    private Vector2 CalculateStickCenterOffset(StickData stick)
+    {
+        Vector2 total = Vector2.zero;
+        foreach (var segment in stick.segments)
+        {
+            total += (Vector2)(segment.start + segment.end) * 0.5f;
+        }
+        return total / (float)stick.segments.Length;
     }
 
     public void ClearHighlights()
@@ -411,17 +443,24 @@ public class GridManager : MonoBehaviour
                 }
             }
         }
+
+        foreach (var cellPos in currentBlastPreviewCells)
+        {
+            cells[cellPos.x, cellPos.y].ClearBlastPreview();
+        }
+        currentBlastPreviewCells.Clear();
     }
 
     public bool CanPlaceStick(Vector2Int origin, StickData stick)
     {
         if (!IsValidPlacement(origin, stick)) return false;
 
+        Vector2 centerOffset = CalculateStickCenterOffset(stick);
         foreach (var segment in stick.segments)
         {
-            Vector2Int start = origin + segment.start;
-            Vector2Int end = origin + segment.end;
-            
+            Vector2Int start = origin + segment.start - Vector2Int.RoundToInt(centerOffset);
+            Vector2Int end = origin + segment.end - Vector2Int.RoundToInt(centerOffset);
+
             Connection conn = GetConnection(start, end);
             if (conn == null || conn.IsOccupied) return false;
         }
@@ -433,11 +472,12 @@ public class GridManager : MonoBehaviour
     {
         if (!CanPlaceStick(origin, stick)) return false;
 
+        Vector2 centerOffset = CalculateStickCenterOffset(stick);
         foreach (var segment in stick.segments)
         {
-            Vector2Int start = origin + segment.start;
-            Vector2Int end = origin + segment.end;
-            
+            Vector2Int start = origin + segment.start - Vector2Int.RoundToInt(centerOffset);
+            Vector2Int end = origin + segment.end - Vector2Int.RoundToInt(centerOffset);
+
             Connection conn = GetConnection(start, end);
             if (conn != null)
             {
@@ -456,20 +496,27 @@ public class GridManager : MonoBehaviour
 
     private bool IsValidPlacement(Vector2Int origin, StickData stick)
     {
+        Vector2 centerOffset = CalculateStickCenterOffset(stick);
         foreach (var segment in stick.segments)
         {
-            Vector2Int start = origin + segment.start;
-            Vector2Int end = origin + segment.end;
-            
+            Vector2Int start = origin + segment.start - Vector2Int.RoundToInt(centerOffset);
+            Vector2Int end = origin + segment.end - Vector2Int.RoundToInt(centerOffset);
+
             if (!IsValidGridPosition(start) || !IsValidGridPosition(end)) return false;
             if (!IsValidConnection(start, end)) return false;
         }
         return true;
     }
 
-    private bool IsValidGridPosition(Vector2Int pos)
+    public bool IsValidGridPosition(Vector2Int pos)
     {
         return pos.x >= 0 && pos.x < width && pos.y >= 0 && pos.y < height;
+    }
+
+    public bool IsConnectionOccupied(Vector2Int start, Vector2Int end)
+    {
+        Connection conn = GetConnection(start, end);
+        return conn == null || conn.IsOccupied;
     }
 
     public Color GetThemeColor()
@@ -481,7 +528,7 @@ public class GridManager : MonoBehaviour
     {
         Vector2Int min = Vector2Int.zero;
         Vector2Int max = Vector2Int.zero;
-        
+
         foreach (var segment in stick.segments)
         {
             min.x = Mathf.Min(min.x, Mathf.Min(segment.start.x, segment.end.x));
@@ -510,5 +557,114 @@ public class GridManager : MonoBehaviour
         }
 
         return false;
+    }
+
+    private List<Vector2Int> SimulatePlacement(Vector2Int origin, StickData stick)
+    {
+        List<Vector2Int> completedCells = new List<Vector2Int>();
+        Vector2 centerOffset = CalculateStickCenterOffset(stick);
+
+        foreach (var segment in stick.segments)
+        {
+            Vector2Int start = origin + segment.start - Vector2Int.RoundToInt(centerOffset);
+            Vector2Int end = origin + segment.end - Vector2Int.RoundToInt(centerOffset);
+
+            Vector2Int[] cellPositions = GetAdjacentCellPositions(start, end);
+            foreach (Vector2Int cellPos in cellPositions)
+            {
+                if (IsCellWithinBounds(cellPos) && !cells[cellPos.x, cellPos.y].IsComplete())
+                {
+                    if (WouldCompleteCell(cellPos, start, end))
+                    {
+                        completedCells.Add(cellPos);
+                    }
+                }
+            }
+        }
+
+        return completedCells;
+    }
+
+    private bool WouldCompleteCell(Vector2Int cellPos, Vector2Int newStart, Vector2Int newEnd)
+    {
+        Connection[] cellConnections = GetCellConnections(cellPos);
+        foreach (var conn in cellConnections)
+        {
+            if (conn == null) return false;
+            if (!conn.IsOccupied)
+            {
+                if (!IsMatchingConnection(conn, newStart, newEnd))
+                {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+    private bool IsMatchingConnection(Connection conn, Vector2Int start, Vector2Int end)
+    {
+        return (conn.StartDot.GridPosition == start && conn.EndDot.GridPosition == end) ||
+               (conn.StartDot.GridPosition == end && conn.EndDot.GridPosition == start);
+    }
+
+    private List<Vector2Int> CheckPotentialBlast(List<Vector2Int> completedCells)
+    {
+        List<Vector2Int> blastCells = new List<Vector2Int>();
+        Dictionary<int, int> rowCounts = new Dictionary<int, int>();
+        Dictionary<int, int> colCounts = new Dictionary<int, int>();
+
+        foreach (var cell in completedCells)
+        {
+            if (!rowCounts.ContainsKey(cell.y)) rowCounts[cell.y] = 0;
+            if (!colCounts.ContainsKey(cell.x)) colCounts[cell.x] = 0;
+
+            rowCounts[cell.y]++;
+            colCounts[cell.x]++;
+        }
+
+        foreach (var kvp in rowCounts)
+        {
+            if (kvp.Value + GetCompletedCellsInRow(kvp.Key) >= width - 1)
+            {
+                for (int x = 0; x < width - 1; x++)
+                {
+                    blastCells.Add(new Vector2Int(x, kvp.Key));
+                }
+            }
+        }
+
+        foreach (var kvp in colCounts)
+        {
+            if (kvp.Value + GetCompletedCellsInColumn(kvp.Key) >= height - 1)
+            {
+                for (int y = 0; y < height - 1; y++)
+                {
+                    blastCells.Add(new Vector2Int(kvp.Key, y));
+                }
+            }
+        }
+
+        return blastCells;
+    }
+
+    private int GetCompletedCellsInRow(int row)
+    {
+        int count = 0;
+        for (int x = 0; x < width - 1; x++)
+        {
+            if (cells[x, row].IsComplete()) count++;
+        }
+        return count;
+    }
+
+    private int GetCompletedCellsInColumn(int col)
+    {
+        int count = 0;
+        for (int y = 0; y < height - 1; y++)
+        {
+            if (cells[col, y].IsComplete()) count++;
+        }
+        return count;
     }
 }

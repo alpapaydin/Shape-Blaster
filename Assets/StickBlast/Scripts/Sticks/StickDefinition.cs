@@ -16,6 +16,7 @@ namespace StickBlast.Sticks
         public StickShape shape;
         public StickSegment[] segments;
         public StickPart[] stickParts;
+        public float scaleMultiplier = 1f;
 
         public StickSegment[] GetRotatedSegments(StickOrientation orientation)
         {

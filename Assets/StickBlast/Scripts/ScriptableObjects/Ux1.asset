@@ -28,3 +28,4 @@ MonoBehaviour:
     relativePosition: {x: -123, y: 145}
   - sprite: {fileID: 21300000, guid: afbc7b02896c66e4aa39c61d8c6aff14, type: 3}
     relativePosition: {x: 122, y: 145}
+  scaleMultiplier: 5

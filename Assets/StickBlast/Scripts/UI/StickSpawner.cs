@@ -7,32 +7,22 @@ public class StickSpawner : MonoBehaviour
     [SerializeField] private GameObject stickUIPrefab;
     [SerializeField] private Transform stickContainer;
     [SerializeField] private int maxSticks = 3;
-    [SerializeField] private float minSpacing = 100f;
-    [SerializeField] private float paddingMultiplier = 1.2f;
     [SerializeField] private Canvas canvas;
     [SerializeField] private StickDefinition[] availableSticks;
-    [SerializeField] private float containerMargin = 20f;
-    [SerializeField] private float stickScale = 1f;
+    [SerializeField] private float previewScaleMultiplier = 0.5f;
+    [SerializeField] private float dragScaleMultiplier = 1f;
 
     private Vector2[] slotPositions;
     private bool[] occupiedSlots;
     private GridManager gridManager;
-    private Transform spawnedSticksContainer;
 
     private void Start()
     {
         gridManager = FindObjectOfType<GridManager>();
         slotPositions = new Vector2[maxSticks];
         occupiedSlots = new bool[maxSticks];
-        
-        spawnedSticksContainer = new GameObject("SpawnedSticks", typeof(RectTransform)).transform;
-        spawnedSticksContainer.SetParent(stickContainer, false);
-        
-        RectTransform containerRect = spawnedSticksContainer.GetComponent<RectTransform>();
-        containerRect.anchorMin = Vector2.zero;
-        containerRect.anchorMax = Vector2.one;
-        containerRect.offsetMin = new Vector2(containerMargin, containerMargin);
-        containerRect.offsetMax = new Vector2(-containerMargin, -containerMargin);
+
+        RectTransform containerRect = (RectTransform)stickContainer;
         
         CalculateSlotPositions();
         SpawnInitialSticks();
@@ -40,15 +30,14 @@ public class StickSpawner : MonoBehaviour
 
     private void CalculateSlotPositions()
     {
-        float maxWidth = StickDraggable.CalculateMaxWidth(availableSticks, stickScale);
-        float spacing = Mathf.Max(minSpacing, maxWidth * paddingMultiplier);
-        
-        float totalWidth = spacing * (maxSticks - 1);
-        float startX = -totalWidth * 0.5f;
+        RectTransform containerRect = (RectTransform)stickContainer;
+        float containerWidth = containerRect.rect.width;
+        float slotWidth = containerWidth / maxSticks;
+        float startX = -containerWidth * 0.5f + (slotWidth * 0.5f);
 
         for (int i = 0; i < maxSticks; i++)
         {
-            slotPositions[i] = new Vector2(startX + (spacing * i), 0);
+            slotPositions[i] = new Vector2(startX + (slotWidth * i), 0);
         }
     }
 
@@ -65,25 +54,28 @@ public class StickSpawner : MonoBehaviour
         int slotIndex = -1;
         for (int i = 0; i < maxSticks; i++)
         {
-            if (!occupiedSlots[i])
-            {
+            if (!occupiedSlots[i]) {
                 slotIndex = i;
                 break;
             }
         }
-
         if (slotIndex == -1) return;
 
         StickData stickData = GetRandomStickData();
-        GameObject stickUI = Instantiate(stickUIPrefab, spawnedSticksContainer);
+        GameObject stickUI = Instantiate(stickUIPrefab, stickContainer);
+        
+        RectTransform containerRect = (RectTransform)stickContainer;
+        float slotWidth = containerRect.rect.width / maxSticks;
+        float slotHeight = containerRect.rect.height;
         
         RectTransform rect = stickUI.GetComponent<RectTransform>();
         rect.anchoredPosition = slotPositions[slotIndex];
-        rect.pivot = new Vector2(0.5f, 0.5f);
+        rect.sizeDelta = new Vector2(slotWidth, slotHeight);
         
         StickDraggable dragHandler = stickUI.GetComponent<StickDraggable>();
-        dragHandler.visualScale = stickScale;
-        dragHandler.Initialize(stickData);
+        dragHandler.previewScaleMultiplier = previewScaleMultiplier;
+        dragHandler.dragScaleMultiplier = dragScaleMultiplier;
+        dragHandler.Initialize(stickData, new Vector2(slotWidth, slotHeight));
         dragHandler.SetCanvas(canvas);
         dragHandler.SetSlotIndex(slotIndex);
 

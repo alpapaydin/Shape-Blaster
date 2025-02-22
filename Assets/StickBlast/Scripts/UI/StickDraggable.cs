@@ -7,8 +7,9 @@ using System.Collections.Generic;
 public class StickDraggable : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHandler
 {
     [SerializeField] private Canvas canvas;
-    [SerializeField] private float dragOffset = 100f;
-    [SerializeField] public float visualScale = 1f;
+    public float previewScaleMultiplier = 0.5f;
+    public float dragScaleMultiplier = 1f;
+    private float currentScaleMultiplier;
     private RectTransform rectTransform;
     private StickData stickData;
     private GridManager gridManager;
@@ -16,9 +17,10 @@ public class StickDraggable : MonoBehaviour, IBeginDragHandler, IDragHandler, IE
     private Vector2Int currentGridPosition;
     private StickSpawner spawner;
     private int slotIndex;
-    private Vector2 dragStartOffset;
     private RectTransform dragArea;
     private Vector2 gridOffset;
+    private float baseScale;
+    private bool isDragging = false;
 
     public StickData StickData => stickData;
     
@@ -29,9 +31,21 @@ public class StickDraggable : MonoBehaviour, IBeginDragHandler, IDragHandler, IE
         spawner = GetComponentInParent<StickSpawner>();
     }
 
-    public void Initialize(StickData data)
+    public void Initialize(StickData data, Vector2 slotSize)
     {
         stickData = data;
+        rectTransform.sizeDelta = slotSize;
+        
+        var tempContainer = CreateContainer("TempContainer");
+        Bounds bounds = CreateStickParts(tempContainer, 1f);
+        Destroy(tempContainer.gameObject);
+        
+        float padding = 0.9f;
+        float scaleX = (slotSize.x * padding) / bounds.size.x;
+        float scaleY = (slotSize.y * padding) / bounds.size.y;
+        baseScale = Mathf.Min(scaleX, scaleY);
+        
+        currentScaleMultiplier = baseScale * previewScaleMultiplier;
         UpdateStickVisual();
     }
 
@@ -47,28 +61,27 @@ public class StickDraggable : MonoBehaviour, IBeginDragHandler, IDragHandler, IE
 
     public void OnBeginDrag(PointerEventData eventData)
     {
+        isDragging = true;
         originalPosition = rectTransform.anchoredPosition;
+        currentScaleMultiplier = gridManager.GetCurrentScale() * dragScaleMultiplier * stickData.definition.scaleMultiplier;
+        UpdateStickVisual();
         
-        bool canBePlaced = gridManager.CanStickBePlacedAnywhere(stickData);
-        if (!canBePlaced && spawner != null)
+        if (!gridManager.CanStickBePlacedAnywhere(stickData) && spawner != null)
         {
             spawner.CheckGameOver(this);
         }
-        
-        Vector2 touchPos;
-        RectTransformUtility.ScreenPointToLocalPointInRectangle(
-            (RectTransform)transform.parent, 
-            eventData.position, 
-            eventData.pressEventCamera, 
-            out touchPos
-        );
-        
-        rectTransform.anchoredPosition = touchPos + Vector2.up * dragOffset;
-        dragStartOffset = rectTransform.anchoredPosition - touchPos;
+
+        UpdateDragPosition(eventData);
     }
 
     public void OnDrag(PointerEventData eventData)
     {
+        UpdateDragPosition(eventData);
+        UpdateGridHighlight();
+    }
+
+    private void UpdateDragPosition(PointerEventData eventData)
+    {
         Vector2 touchPos;
         RectTransformUtility.ScreenPointToLocalPointInRectangle(
             (RectTransform)transform.parent, 
@@ -76,13 +89,23 @@ public class StickDraggable : MonoBehaviour, IBeginDragHandler, IDragHandler, IE
             eventData.pressEventCamera, 
             out touchPos
         );
-        rectTransform.anchoredPosition = touchPos + dragStartOffset;
-        
-        UpdateGridHighlight();
+
+        var partsContainer = transform.Find("PartsContainer");
+        if (partsContainer != null)
+        {
+            var containerRect = partsContainer.GetComponent<RectTransform>();
+            var weightedCenter = CalculatePartsWeightedCenter();
+            
+            float angle = -(int)stickData.orientation;
+            Vector2 rotatedOffset = Quaternion.Euler(0, 0, angle) * weightedCenter;
+            
+            rectTransform.anchoredPosition = touchPos - rotatedOffset;
+        }
     }
 
     public void OnEndDrag(PointerEventData eventData)
     {
+        isDragging = false;
         if (CanPlaceAtCurrentPosition())
         {
             PlaceStick();
@@ -90,53 +113,31 @@ public class StickDraggable : MonoBehaviour, IBeginDragHandler, IDragHandler, IE
         else
         {
             rectTransform.anchoredPosition = originalPosition;
+            currentScaleMultiplier = baseScale * previewScaleMultiplier;
+            UpdateStickVisual();
         }
         gridManager.ClearHighlights();
     }
 
-    private bool IsSinglePartIShape()
-    {
-        return stickData.segments.Length == 1 && 
-               (stickData.segments[0].start.x == stickData.segments[0].end.x || 
-                stickData.segments[0].start.y == stickData.segments[0].end.y);
-    }
-
     private void UpdateGridHighlight()
     {
-        Vector3[] corners = new Vector3[4];
-        dragArea.GetWorldCorners(corners);
-        Vector3 dragAreaCenter = (corners[0] + corners[2]) * 0.5f;
-        
-        float worldHalfSize = (dragArea.sizeDelta.x * 0.5f) * dragArea.lossyScale.x;
-        float angle = -(int)stickData.orientation * Mathf.Deg2Rad;
-        float cos = Mathf.Cos(angle);
-        float sin = Mathf.Sin(angle);
+        var partsContainer = transform.Find("PartsContainer");
+        if (partsContainer == null) return;
 
-        Vector2 cornerOffset = IsSinglePartIShape() 
-            ? new Vector2(0, -worldHalfSize)
-            : new Vector2(-worldHalfSize, -worldHalfSize);
+        RectTransform containerRect = partsContainer.GetComponent<RectTransform>();
+        Vector2 weightedCenter = CalculatePartsWeightedCenter();
+        
+        Vector3 worldPosition = containerRect.TransformPoint(weightedCenter);
 
-        Vector2 rotatedCornerOffset = new Vector2(
-            cornerOffset.x * cos - cornerOffset.y * sin,
-            cornerOffset.x * sin + cornerOffset.y * cos
-        );
-        
-        Vector3 originPoint = dragAreaCenter + (Vector3)rotatedCornerOffset;
-        
-        Vector2 rotatedGridOffset = new Vector2(
-            gridOffset.x * cos - gridOffset.y * sin,
-            gridOffset.x * sin + gridOffset.y * cos
-        );
-        
-        Vector3 adjustedPosition = originPoint + (Vector3)(rotatedGridOffset * dragArea.lossyScale.x);
-        
-        Vector2Int gridPos = gridManager.WorldToGridPosition(adjustedPosition);
-        
-        if (gridPos != currentGridPosition)
-        {
-            currentGridPosition = gridPos;
-            gridManager.HighlightPotentialPlacement(gridPos, stickData);
-        }
+        currentGridPosition = gridManager.WorldToGridPosition(worldPosition);
+        gridManager.HighlightPotentialPlacement(currentGridPosition, stickData);
+    }
+
+    private bool IsValidSegment(Vector2Int start, Vector2Int end)
+    {
+        return gridManager.IsValidGridPosition(start) && 
+               gridManager.IsValidGridPosition(end) && 
+               !gridManager.IsConnectionOccupied(start, end);
     }
 
     private bool CanPlaceAtCurrentPosition()
@@ -169,18 +170,11 @@ public class StickDraggable : MonoBehaviour, IBeginDragHandler, IDragHandler, IE
 
         var container = CreateContainer("PartsContainer");
         dragArea = CreateContainer("DragArea");
-        
-        var dragImage = dragArea.gameObject.AddComponent<Image>();
-        dragImage.color = new Color(1, 1, 1, 0);
+        dragArea.gameObject.AddComponent<Image>().color = Color.clear;
+
+        CreateStickParts(container, currentScaleMultiplier);
         SetRectToFill(dragArea);
-
-        Bounds bounds = CreateStickParts(container);
-
-        float size = Mathf.Max(bounds.size.x, bounds.size.y) * visualScale;
-        rectTransform.sizeDelta = new Vector2(size, size);
-        container.sizeDelta = new Vector2(size, size);
-        dragArea.sizeDelta = new Vector2(size / visualScale, size / visualScale);
-
+        
         float halfGridUnit = 0.5f;
         gridOffset = new Vector2(-halfGridUnit, -halfGridUnit);
     }
@@ -202,7 +196,7 @@ public class StickDraggable : MonoBehaviour, IBeginDragHandler, IDragHandler, IE
         rect.offsetMin = rect.offsetMax = Vector2.zero;
     }
 
-    private Bounds CreateStickParts(RectTransform container)
+    private Bounds CreateStickParts(RectTransform container, float scale)
     {
         var bounds = new Bounds();
         
@@ -220,8 +214,8 @@ public class StickDraggable : MonoBehaviour, IBeginDragHandler, IDragHandler, IE
 
             var rect = partObj.GetComponent<RectTransform>();
             rect.pivot = new Vector2(0.5f, 0.5f);
-            rect.sizeDelta *= visualScale;
-            rect.anchoredPosition = part.relativePosition * visualScale;
+            rect.sizeDelta *= scale;
+            rect.anchoredPosition = part.relativePosition * scale;
 
             Vector2 size = rect.sizeDelta;
             Vector2 pos = rect.anchoredPosition;
@@ -229,47 +223,44 @@ public class StickDraggable : MonoBehaviour, IBeginDragHandler, IDragHandler, IE
             bounds.Encapsulate(new Vector3(pos.x - size.x/2, pos.y - size.y/2, 0));
         }
 
-        foreach (RectTransform child in container)
+        if (isDragging)
         {
-            child.anchoredPosition -= (Vector2)bounds.center;
+            Vector2 weightedCenter = CalculatePartsWeightedCenter();
+            foreach (RectTransform child in container)
+            {
+                child.anchoredPosition -= weightedCenter;
+            }
+        }
+        else
+        {
+            foreach (RectTransform child in container)
+            {
+                child.anchoredPosition -= (Vector2)bounds.center;
+            }
         }
 
         container.localRotation = Quaternion.Euler(0, 0, -(int)stickData.orientation);
-
         return bounds;
     }
 
-    public static Vector2 CalculateStickBounds(StickDefinition stick, float scale = 1f)
+    private Vector2 CalculatePartsWeightedCenter()
     {
-        if (stick.stickParts == null || stick.stickParts.Length == 0)
-            return Vector2.one * 100f * scale;
+        var partsContainer = transform.Find("PartsContainer");
+        if (partsContainer == null) return Vector2.zero;
 
-        var bounds = new Bounds();
-        foreach (var part in stick.stickParts)
-        {
-            if (part.sprite == null) continue;
-            bounds.Encapsulate(new Vector3(
-                part.relativePosition.x + part.sprite.bounds.size.x/2,
-                part.relativePosition.y + part.sprite.bounds.size.y/2,
-                0
-            ));
-            bounds.Encapsulate(new Vector3(
-                part.relativePosition.x - part.sprite.bounds.size.x/2,
-                part.relativePosition.y - part.sprite.bounds.size.y/2,
-                0
-            ));
-        }
-        return bounds.size * scale;
-    }
+        Vector2 totalPosition = Vector2.zero;
+        float totalWeight = 0f;
 
-    public static float CalculateMaxWidth(StickDefinition[] sticks, float scale = 1f)
-    {
-        float maxWidth = 0;
-        foreach (var stick in sticks)
+        foreach (RectTransform child in partsContainer)
         {
-            float stickWidth = CalculateStickBounds(stick, scale).x;
-            maxWidth = Mathf.Max(maxWidth, stickWidth);
+            Vector2 size = child.sizeDelta;
+            float weight = size.x * size.y;
+            Vector2 pos = child.anchoredPosition;
+            
+            totalPosition += pos * weight;
+            totalWeight += weight;
         }
-        return maxWidth;
+
+        return totalWeight > 0 ? totalPosition / totalWeight : Vector2.zero;
     }
 }

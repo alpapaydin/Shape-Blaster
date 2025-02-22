@@ -214,13 +214,15 @@ MonoBehaviour:
   stickUIPrefab: {fileID: 6290667868450397293, guid: 701166bc5056cae47842da4b465e4e7d, type: 3}
   stickContainer: {fileID: 138245768}
   maxSticks: 3
-  minSpacing: 300
-  paddingMultiplier: 1.2
   canvas: {fileID: 688628345}
   availableSticks:
   - {fileID: 11400000, guid: cfa5a52933191f84c96cbbab36edca94, type: 2}
-  containerMargin: 20
-  stickScale: 0.5
+  - {fileID: 11400000, guid: 522d8134b71cc954f9103d53645439ba, type: 2}
+  - {fileID: 11400000, guid: 7130d9c07acd4b146a5be71e0a427b06, type: 2}
+  - {fileID: 11400000, guid: c6b62e813435f8747a46ccba1c8398c8, type: 2}
+  - {fileID: 11400000, guid: a7846bba9cd02a54b8925fd2df30ec39, type: 2}
+  previewScaleMultiplier: 1
+  dragScaleMultiplier: 0.1
 --- !u!1 &359570527
 GameObject:
   m_ObjectHideFlags: 0
