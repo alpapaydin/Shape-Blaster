@@ -45,6 +45,7 @@ namespace StickBlast.Grid
             if (allBlastPositions.Count == 0) return;
 
             comboCount++;
+            SoundManager.Instance.PlaySoundDelayed("blast", allBlastPositions.Count, 0.1f, 0.7f);
             Debug.Log($"Combo #{comboCount}: Found {allBlastPositions.Count} lines to blast!");
 
             foreach (var pos in allBlastPositions)

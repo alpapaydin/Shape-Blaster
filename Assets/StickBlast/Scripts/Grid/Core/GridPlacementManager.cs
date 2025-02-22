@@ -27,10 +27,14 @@ namespace StickBlast.Grid
 
         public void HighlightPotentialPlacement(Vector2Int origin, StickData stick)
         {
+            bool wasValid = validator.CanPlaceStick(origin, stick, CalculateStickCenterOffset(stick));
             ClearHighlights();
 
-            if (!validator.CanPlaceStick(origin, stick, CalculateStickCenterOffset(stick))) 
+            if (!wasValid)
+            {
+                SoundManager.Instance.FadeOutSound("highlightBlast");
                 return;
+            }
 
             Vector2 centerOffset = CalculateStickCenterOffset(stick);
             HighlightValidConnections(origin, stick, centerOffset);
@@ -60,8 +64,11 @@ namespace StickBlast.Grid
         public bool PlaceStick(Vector2Int origin, StickData stick)
         {
             Vector2 centerOffset = CalculateStickCenterOffset(stick);
-            if (!validator.CanPlaceStick(origin, stick, centerOffset)) 
+            if (!validator.CanPlaceStick(origin, stick, centerOffset))
+            {
+                SoundManager.Instance.FadeOutSound("highlightBlast");
                 return false;
+            }
 
             blastManager.ResetCombo();
 
@@ -132,7 +139,6 @@ namespace StickBlast.Grid
             if (completedCells.Count > 0)
             {
                 var simulatedState = new HashSet<Vector2Int>(completedCells);
-
                 var blastCells = new HashSet<Vector2Int>();
                 
                 for (int y = 0; y < state.Height - 1; y++)
@@ -167,6 +173,15 @@ namespace StickBlast.Grid
                 {
                     cellManager.ShowBlastPreview(cellPos);
                 }
+
+                if (blastCells.Count > 0)
+                    SoundManager.Instance.TryPlaySound("highlightBlast");
+                else
+                    SoundManager.Instance.FadeOutSound("highlightBlast");
+            }
+            else
+            {
+                SoundManager.Instance.FadeOutSound("highlightBlast");
             }
         }
 

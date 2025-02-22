@@ -19,30 +19,44 @@ namespace StickBlast.Grid
         {
             for (int y = 2; y <= 4; y++)
             {
-                FillConnection(new Vector2Int(0, y), new Vector2Int(1, y));
-                FillConnection(new Vector2Int(1, y), new Vector2Int(2, y));
-                FillConnection(new Vector2Int(2, y), new Vector2Int(3, y));
-                FillConnection(new Vector2Int(4, y), new Vector2Int(5, y));
+                for (int x = 0; x < state.Width - 1; x++)
+                {
+                    if (x == 3 && y == 3) continue;
+                    FillConnection(new Vector2Int(x, y), new Vector2Int(x + 1, y));
+                }
             }
 
-            FillConnection(new Vector2Int(0, 2), new Vector2Int(0, 3));
-            FillConnection(new Vector2Int(1, 2), new Vector2Int(1, 3));
-            FillConnection(new Vector2Int(2, 2), new Vector2Int(2, 3));
-            FillConnection(new Vector2Int(3, 2), new Vector2Int(3, 3));
-            FillConnection(new Vector2Int(4, 2), new Vector2Int(4, 3));
-            FillConnection(new Vector2Int(5, 2), new Vector2Int(5, 3));
+            for (int x = 0; x <= 5; x++)
+            {
+                for (int y = 2; y <= 3; y++)
+                {
+                    FillConnection(new Vector2Int(x, y), new Vector2Int(x, y + 1));
+                }
+            }
 
-            FillConnection(new Vector2Int(0, 3), new Vector2Int(0, 4));
-            FillConnection(new Vector2Int(1, 3), new Vector2Int(1, 4));
-            FillConnection(new Vector2Int(2, 3), new Vector2Int(2, 4));
-            FillConnection(new Vector2Int(3, 3), new Vector2Int(3, 4));
-            FillConnection(new Vector2Int(4, 3), new Vector2Int(4, 4));
-            FillConnection(new Vector2Int(5, 3), new Vector2Int(5, 4));
+            for (int x = 3; x <= 4; x++)
+            {
+                for (int y = 0; y <= 4; y++)
+                {
+                    if (y == 2) continue;
+                    FillConnection(new Vector2Int(x, y), new Vector2Int(x, y + 1));
+                }
+            }
+
+            for (int y = 0; y <= 5; y += 5)
+            {
+                FillConnection(new Vector2Int(3, y), new Vector2Int(4, y));
+            }
+            FillConnection(new Vector2Int(3, 1), new Vector2Int(4, 1));
 
             for (int x = 0; x < state.Width - 1; x++)
             {
                 cellManager.CheckAndCompleteCell(new Vector2Int(x, 2));
                 cellManager.CheckAndCompleteCell(new Vector2Int(x, 3));
+            }
+            for (int y = 0; y < state.Height - 1; y++)
+            {
+                cellManager.CheckAndCompleteCell(new Vector2Int(3, y));
             }
         }
 

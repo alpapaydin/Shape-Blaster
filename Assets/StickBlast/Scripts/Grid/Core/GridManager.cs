@@ -49,6 +49,8 @@ public class GridManager : MonoBehaviour
             var debugger = new GridDebugger(state, connectionManager, cellManager);
             debugger.FillTestPattern();
         }
+
+        GameManager.Instance.StartGame();
     }
 
     private void OnRectTransformDimensionsChange()
@@ -77,6 +79,9 @@ public class GridManager : MonoBehaviour
 
     public bool PlaceStick(Vector2Int position, StickData stick)
     {
+        if (!GameManager.Instance.IsPlaying())
+            return false;
+
         return placementManager.PlaceStick(position, stick);
     }
 
@@ -131,5 +136,13 @@ public class GridManager : MonoBehaviour
     public bool IsConnectionOccupied(Vector2Int start, Vector2Int end)
     {
         return validator.IsConnectionOccupied(start, end);
+    }
+
+    public void CheckWinCondition()
+    {
+        if (false)
+        {
+            GameManager.Instance.WinGame();
+        }
     }
 }

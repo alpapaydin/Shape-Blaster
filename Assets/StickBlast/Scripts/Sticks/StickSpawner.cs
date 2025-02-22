@@ -116,9 +116,7 @@ public class StickSpawner : MonoBehaviour
     private void CheckGameOver()
     {
         if (IsGameOver())
-        {
-            Debug.Log("Game Over - No valid moves left!");
-        }
+            GameManager.Instance.LoseGame();
     }
 
     public void OnStickPlaced(int slotIndex)
@@ -141,8 +139,6 @@ public class StickSpawner : MonoBehaviour
                 return;
             }
         }
-        
-        Debug.Log("Game Over - No valid moves left!");
-        // OnGameOver.Invoke();
+        GameManager.Instance.LoseGame();
     }
 }

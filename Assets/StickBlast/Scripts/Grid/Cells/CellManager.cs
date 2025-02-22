@@ -28,6 +28,7 @@ namespace StickBlast.Grid
 
             if (isComplete)
             {
+                SoundManager.Instance.PlaySound("completeCell");
                 state.Cells[cellPos.x, cellPos.y].SetComplete(true, true);
                 blastManager.CheckForBlast();
             }

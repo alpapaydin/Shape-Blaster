@@ -61,6 +61,7 @@ public class StickDraggable : MonoBehaviour, IBeginDragHandler, IDragHandler, IE
 
     public void OnBeginDrag(PointerEventData eventData)
     {
+        SoundManager.Instance.PlaySound("pop");
         isDragging = true;
         originalPosition = rectTransform.anchoredPosition;
         currentScaleMultiplier = gridManager.GetCurrentScale() * dragScaleMultiplier * stickData.definition.scaleMultiplier;
@@ -108,6 +109,7 @@ public class StickDraggable : MonoBehaviour, IBeginDragHandler, IDragHandler, IE
         isDragging = false;
         if (CanPlaceAtCurrentPosition())
         {
+            SoundManager.Instance.PlaySound("click");
             PlaceStick();
         }
         else
@@ -116,6 +118,8 @@ public class StickDraggable : MonoBehaviour, IBeginDragHandler, IDragHandler, IE
             currentScaleMultiplier = baseScale * previewScaleMultiplier;
             UpdateStickVisual();
         }
+        
+        SoundManager.Instance.StopSound("highlightBlast");
         gridManager.ClearHighlights();
     }
 

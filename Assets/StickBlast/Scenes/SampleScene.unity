@@ -222,7 +222,7 @@ MonoBehaviour:
   - {fileID: 11400000, guid: c6b62e813435f8747a46ccba1c8398c8, type: 2}
   - {fileID: 11400000, guid: a7846bba9cd02a54b8925fd2df30ec39, type: 2}
   previewScaleMultiplier: 1
-  dragScaleMultiplier: 0.1
+  dragScaleMultiplier: 0.15
 --- !u!1 &359570527
 GameObject:
   m_ObjectHideFlags: 0
@@ -286,6 +286,98 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &517608143
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 517608146}
+  - component: {fileID: 517608145}
+  - component: {fileID: 517608144}
+  m_Layer: 0
+  m_Name: GameManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &517608144
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 517608143}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 736bdb463b0e956438fbc37733189099, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  sounds:
+  - name: pop
+    clip: {fileID: 8300000, guid: 63c9b15b313066742b5888ed5a50b377, type: 3}
+    volume: 1
+    pitch: 1
+    loop: 0
+    source: {fileID: 0}
+  - name: click
+    clip: {fileID: 8300000, guid: 11017f6754b698e419236acdd362c170, type: 3}
+    volume: 0.366
+    pitch: 1
+    loop: 0
+    source: {fileID: 0}
+  - name: completeCell
+    clip: {fileID: 8300000, guid: 0a67ac0f292a39d45bdf739be2a44bf6, type: 3}
+    volume: 1
+    pitch: 1
+    loop: 0
+    source: {fileID: 0}
+  - name: highlightBlast
+    clip: {fileID: 8300000, guid: 9b1211e4e271e764da7e081a0205bcb6, type: 3}
+    volume: 1
+    pitch: 1
+    loop: 1
+    source: {fileID: 0}
+  - name: blast
+    clip: {fileID: 8300000, guid: f23c200019d2af1479ae8251d1747d19, type: 3}
+    volume: 0.754
+    pitch: 1
+    loop: 0
+    source: {fileID: 0}
+  poolSize: 10
+  masterVolume: 1
+  sfxVolume: 1
+  uiVolume: 1
+--- !u!114 &517608145
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 517608143}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b49e281202b13cf4fbdaf54091ebb5b1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!4 &517608146
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 517608143}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0.48215955, y: -1.7115737, z: -0.026013521}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -641,9 +733,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c2f5cfdb41355f94aa09391a2363e9a2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  mainCamera: {fileID: 519420031}
-  padding: 2
-  targetAspectRatio: 1
 --- !u!4 &1792620763
 Transform:
   m_ObjectHideFlags: 0
@@ -693,11 +782,11 @@ MonoBehaviour:
   dotPrefab: {fileID: 7036382262088913388, guid: 79c1cb59bc30e6948ac01f2cb3de014e, type: 3}
   connectionPrefab: {fileID: 7036382262088913388, guid: 36c98d544489f7d479f784275cafcd69, type: 3}
   cellPrefab: {fileID: 2282444658204982986, guid: 058fc37fce1a6244699349523172da60, type: 3}
-  layoutManager: {fileID: 1792620762}
   mainCamera: {fileID: 519420031}
   highlightColor: {r: 0, g: 1, b: 0, a: 0.41568628}
   themeColor: {r: 0, g: 1, b: 0, a: 1}
   emptyColor: {r: 0, g: 0, b: 0.3301887, a: 1}
+  enableDebugPattern: 1
 --- !u!4 &1799689426
 Transform:
   m_ObjectHideFlags: 0
@@ -723,3 +812,4 @@ SceneRoots:
   - {fileID: 1792620763}
   - {fileID: 688628346}
   - {fileID: 359570530}
+  - {fileID: 517608146}
