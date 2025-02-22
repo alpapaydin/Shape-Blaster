@@ -276,14 +276,13 @@ MonoBehaviour:
   m_FirstSelected: {fileID: 0}
   m_sendNavigationEvents: 1
   m_DragThreshold: 10
---- !u!4 &359570530
-Transform:
+--- !u!224 &359570530
+RectTransform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 359570527}
-  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
@@ -291,6 +290,11 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 20, y: 5}
+  m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &517608143
 GameObject:
   m_ObjectHideFlags: 0
@@ -323,13 +327,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   sounds:
   - name: pop
-    clip: {fileID: 8300000, guid: 63c9b15b313066742b5888ed5a50b377, type: 3}
+    clip: {fileID: 8300000, guid: 94a576840d5376948a8584150f8d8574, type: 3}
     volume: 1
     pitch: 1
     loop: 0
     source: {fileID: 0}
   - name: click
-    clip: {fileID: 8300000, guid: 11017f6754b698e419236acdd362c170, type: 3}
+    clip: {fileID: 8300000, guid: a0cbe8e025e30524c9f39f47894fbaa5, type: 3}
     volume: 0.366
     pitch: 1
     loop: 0
@@ -614,6 +618,7 @@ GameObject:
   - component: {fileID: 688628345}
   - component: {fileID: 688628344}
   - component: {fileID: 688628343}
+  - component: {fileID: 688628347}
   m_Layer: 5
   m_Name: Canvas
   m_TagString: Untagged
@@ -704,6 +709,20 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0, y: 0}
+--- !u!114 &688628347
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 688628342}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2bb29353485f48a48a3d592888b45d55, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  losePopupPrefab: {fileID: 1915917909225865202, guid: b4d8fc55c6520ff438003e6b3c8da940, type: 3}
+  winPopupPrefab: {fileID: 2911605927438514138, guid: 8cef94b9dd047d447b08ee839f4b2a93, type: 3}
 --- !u!1 &1792620761
 GameObject:
   m_ObjectHideFlags: 0
@@ -811,5 +830,5 @@ SceneRoots:
   - {fileID: 1799689426}
   - {fileID: 1792620763}
   - {fileID: 688628346}
-  - {fileID: 359570530}
   - {fileID: 517608146}
+  - {fileID: 359570530}

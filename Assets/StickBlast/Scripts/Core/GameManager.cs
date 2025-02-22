@@ -15,6 +15,7 @@ public class GameManager : MonoBehaviour
 
     private GameState currentState;
     private SoundManager soundManager;
+    private UIManager uiManager;
 
     public GameState CurrentState
     {
@@ -46,6 +47,11 @@ public class GameManager : MonoBehaviour
         currentState = GameState.Playing;
     }
 
+    public void SetUIManager(UIManager manager)
+    {
+        uiManager = manager;
+    }
+
     public void StartGame()
     {
         CurrentState = GameState.Playing;
@@ -75,8 +81,10 @@ public class GameManager : MonoBehaviour
             case GameState.Playing:
                 break;
             case GameState.Won:
+                if (uiManager != null) uiManager.ShowWinPopup();
                 break;
             case GameState.Lost:
+                if (uiManager != null) uiManager.ShowLosePopup();
                 break;
         }
     }
