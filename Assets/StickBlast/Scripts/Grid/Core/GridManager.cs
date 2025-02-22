@@ -14,7 +14,6 @@ public class GridManager : MonoBehaviour
     [SerializeField] private GameObject cellPrefab;
     
     [Header("References")]
-    [SerializeField] private LayoutManager layoutManager;
     [SerializeField] private Camera mainCamera;
     
     [Header("Colors")]
