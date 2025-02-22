@@ -133,6 +133,20 @@ public class StickDraggable : MonoBehaviour, IBeginDragHandler, IDragHandler, IE
         gridManager.HighlightPotentialPlacement(currentGridPosition, stickData);
     }
 
+    private void OnDrawGizmos()
+    {
+        var partsContainer = transform.Find("PartsContainer");
+        if (partsContainer == null) return;
+
+        RectTransform containerRect = partsContainer.GetComponent<RectTransform>();
+        Vector2 weightedCenter = CalculatePartsWeightedCenter();
+        
+        Vector3 worldPosition = containerRect.TransformPoint(weightedCenter);
+        
+        Gizmos.color = Color.red;
+        Gizmos.DrawSphere(worldPosition, 0.1f);
+    }
+    
     private bool IsValidSegment(Vector2Int start, Vector2Int end)
     {
         return gridManager.IsValidGridPosition(start) && 
