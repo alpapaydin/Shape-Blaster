@@ -7,6 +7,7 @@ using System.Collections.Generic;
 public class StickDraggable : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHandler
 {
     [SerializeField] private Canvas canvas;
+    [SerializeField] private Vector2 touchOffset = new Vector2(0, 250);
     public float previewScaleMultiplier = 0.5f;
     public float dragScaleMultiplier = 1f;
     private float currentScaleMultiplier;
@@ -21,6 +22,12 @@ public class StickDraggable : MonoBehaviour, IBeginDragHandler, IDragHandler, IE
     private Vector2 gridOffset;
     private float baseScale;
     private bool isDragging = false;
+    private Camera dragCamera;
+    private RectTransform partsContainerRect;
+    private Vector2 weightedCenterCache;
+    private float updateHighlightThreshold = 0.03f;
+    private Vector2 lastHighlightPosition;
+    [SerializeField] private bool useVibration = true;
 
     public StickData StickData => stickData;
     
@@ -29,6 +36,7 @@ public class StickDraggable : MonoBehaviour, IBeginDragHandler, IDragHandler, IE
         rectTransform = GetComponent<RectTransform>();
         gridManager = FindObjectOfType<GridManager>();
         spawner = GetComponentInParent<StickSpawner>();
+        dragCamera = Camera.main;
     }
 
     public void Initialize(StickData data, Vector2 slotSize)
@@ -61,13 +69,18 @@ public class StickDraggable : MonoBehaviour, IBeginDragHandler, IDragHandler, IE
 
     public void OnBeginDrag(PointerEventData eventData)
     {
+        if (isDragging) return;
         SoundManager.Instance.PlaySound("pop");
+        if (useVibration)
+        {
+            Vibration.VibrateMedium();
+        }
         isDragging = true;
         originalPosition = rectTransform.anchoredPosition;
         currentScaleMultiplier = gridManager.GetCurrentScale() * dragScaleMultiplier * stickData.definition.scaleMultiplier;
         UpdateStickVisual();
         
-        if (!gridManager.CanStickBePlacedAnywhere(stickData) && spawner != null)
+        if (spawner != null)
         {
             spawner.CheckGameOver(this);
         }
@@ -77,8 +90,23 @@ public class StickDraggable : MonoBehaviour, IBeginDragHandler, IDragHandler, IE
 
     public void OnDrag(PointerEventData eventData)
     {
-        UpdateDragPosition(eventData);
-        UpdateGridHighlight();
+        if (!isDragging) return;
+        
+        Vector2 touchPos;
+        if (RectTransformUtility.ScreenPointToLocalPointInRectangle(
+            (RectTransform)transform.parent,
+            eventData.position,
+            dragCamera,
+            out touchPos))
+        {
+            rectTransform.anchoredPosition = touchPos - GetRotatedOffset() + touchOffset;
+            
+            if (Vector2.Distance(lastHighlightPosition, touchPos) > updateHighlightThreshold)
+            {
+                UpdateGridHighlight();
+                lastHighlightPosition = touchPos;
+            }
+        }
     }
 
     private void UpdateDragPosition(PointerEventData eventData)
@@ -106,7 +134,6 @@ public class StickDraggable : MonoBehaviour, IBeginDragHandler, IDragHandler, IE
 
     public void OnEndDrag(PointerEventData eventData)
     {
-        isDragging = false;
         if (CanPlaceAtCurrentPosition())
         {
             SoundManager.Instance.PlaySound("click");
@@ -117,6 +144,7 @@ public class StickDraggable : MonoBehaviour, IBeginDragHandler, IDragHandler, IE
             rectTransform.anchoredPosition = originalPosition;
             currentScaleMultiplier = baseScale * previewScaleMultiplier;
             UpdateStickVisual();
+            isDragging = false;
         }
         
         SoundManager.Instance.StopSound("highlightBlast");
@@ -125,14 +153,9 @@ public class StickDraggable : MonoBehaviour, IBeginDragHandler, IDragHandler, IE
 
     private void UpdateGridHighlight()
     {
-        var partsContainer = transform.Find("PartsContainer");
-        if (partsContainer == null) return;
+        if (partsContainerRect == null) return;
 
-        RectTransform containerRect = partsContainer.GetComponent<RectTransform>();
-        Vector2 weightedCenter = CalculatePartsWeightedCenter();
-        
-        Vector3 worldPosition = containerRect.TransformPoint(weightedCenter);
-
+        Vector3 worldPosition = partsContainerRect.TransformPoint(weightedCenterCache);
         currentGridPosition = gridManager.WorldToGridPosition(worldPosition);
         gridManager.HighlightPotentialPlacement(currentGridPosition, stickData);
     }
@@ -146,7 +169,7 @@ public class StickDraggable : MonoBehaviour, IBeginDragHandler, IDragHandler, IE
         Vector2 weightedCenter = CalculatePartsWeightedCenter();
         
         Vector3 worldPosition = containerRect.TransformPoint(weightedCenter);
-        
+
         Gizmos.color = Color.red;
         Gizmos.DrawSphere(worldPosition, 0.1f);
     }
@@ -176,6 +199,7 @@ public class StickDraggable : MonoBehaviour, IBeginDragHandler, IDragHandler, IE
         else
         {
             rectTransform.anchoredPosition = originalPosition;
+            isDragging = false;
         }
     }
 
@@ -280,5 +304,21 @@ public class StickDraggable : MonoBehaviour, IBeginDragHandler, IDragHandler, IE
         }
 
         return totalWeight > 0 ? totalPosition / totalWeight : Vector2.zero;
+    }
+
+    private Vector2 GetRotatedOffset()
+    {
+        if (partsContainerRect == null)
+        {
+            var container = transform.Find("PartsContainer");
+            if (container != null)
+            {
+                partsContainerRect = container.GetComponent<RectTransform>();
+                weightedCenterCache = CalculatePartsWeightedCenter();
+            }
+        }
+        
+        float angle = -(int)stickData.orientation;
+        return Quaternion.Euler(0, 0, angle) * weightedCenterCache;
     }
 }

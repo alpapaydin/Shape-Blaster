@@ -30,6 +30,7 @@ namespace StickBlast.Grid
             if (isComplete)
             {
                 SoundManager.Instance.PlaySound("completeCell");
+                Vibration.VibrateMedium();
                 LevelManager.Instance.AddPoints(50);
                 state.Cells[cellPos.x, cellPos.y].SetComplete(true, true);
                 blastManager.CheckForBlast();

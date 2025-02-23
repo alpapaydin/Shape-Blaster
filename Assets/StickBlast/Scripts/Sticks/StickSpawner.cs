@@ -166,12 +166,6 @@ public class StickSpawner : MonoBehaviour
         return true;
     }
 
-    private void CheckGameOver()
-    {
-        if (IsGameOver())
-            GameManager.Instance.LoseGame();
-    }
-
     public void OnStickPlaced(int slotIndex)
     {
         occupiedSlots[slotIndex] = false;
@@ -180,8 +174,6 @@ public class StickSpawner : MonoBehaviour
         {
             SpawnNewStickGroup();
         }
-        
-        CheckGameOver();
     }
 
     private bool AreAllSlotsEmpty()
@@ -197,16 +189,18 @@ public class StickSpawner : MonoBehaviour
     public void CheckGameOver(StickDraggable currentStick)
     {
         var activeSticks = GetComponentsInChildren<StickDraggable>();
-        
+        if (gridManager.CanStickBePlacedAnywhere(currentStick.StickData))
+            return;
+
         foreach (var stick in activeSticks)
         {
-            if (stick == currentStick) continue;
+            if (stick == currentStick) 
+                continue;
             
             if (gridManager.CanStickBePlacedAnywhere(stick.StickData))
-            {
                 return;
-            }
         }
+        Vibration.VibrateHeavy();
         GameManager.Instance.LoseGame();
     }
 }

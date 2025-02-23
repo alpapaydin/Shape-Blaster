@@ -48,6 +48,7 @@ namespace StickBlast.Grid
 
             comboCount++;
             SoundManager.Instance.PlaySoundDelayed("blast", allBlastPositions.Count, 0.1f, 0.7f);
+            Vibration.VibrateHeavy();
             LevelManager.Instance.AddPoints((int)(Pow(2, allBlastPositions.Count) * 10));
 
             foreach (var pos in allBlastPositions)
