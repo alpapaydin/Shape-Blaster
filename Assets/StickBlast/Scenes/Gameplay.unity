@@ -819,10 +819,15 @@ MonoBehaviour:
   connectionPrefab: {fileID: 7036382262088913388, guid: 36c98d544489f7d479f784275cafcd69, type: 3}
   cellPrefab: {fileID: 2282444658204982986, guid: 058fc37fce1a6244699349523172da60, type: 3}
   mainCamera: {fileID: 519420031}
-  highlightColor: {r: 0, g: 1, b: 0, a: 0.41568628}
-  themeColor: {r: 0, g: 1, b: 0, a: 1}
+  themeColors:
+  - {r: 0.46616194, g: 0.8301887, b: 0.27803493, a: 1}
+  - {r: 0.8213549, g: 0.83137256, b: 0.27843136, a: 1}
+  - {r: 0.83137256, g: 0.35220045, b: 0.27843136, a: 1}
+  - {r: 0.83137256, g: 0.27843136, b: 0.5448124, a: 1}
+  - {r: 0.47001594, g: 0.27843136, b: 0.83137256, a: 1}
+  - {r: 0.27843136, g: 0.580039, b: 0.83137256, a: 1}
+  - {r: 0.27843136, g: 0.83137256, b: 0.7027372, a: 1}
   emptyColor: {r: 0, g: 0, b: 0.3301887, a: 1}
-  enableDebugPattern: 0
 --- !u!4 &1799689426
 Transform:
   m_ObjectHideFlags: 0

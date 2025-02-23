@@ -16,8 +16,7 @@ public class GridManager : MonoBehaviour
     [SerializeField] private Camera mainCamera;
     
     [Header("Colors")]
-    [SerializeField] private Color highlightColor = Color.yellow;
-    [SerializeField] private Color themeColor = Color.green;
+    [SerializeField] private Color[] themeColors;
     [SerializeField] private Color emptyColor = Color.blue;
 
     // Core components
@@ -30,7 +29,7 @@ public class GridManager : MonoBehaviour
     private PlacementManager placementManager;
     private GridValidator validator;
     private GridItemSpawner itemSpawner;
-    
+    private Color themeColor = Color.green;
     private int width = 6;
     private int height = 6;
     public static GridManager Instance { get; private set; }
@@ -39,6 +38,12 @@ public class GridManager : MonoBehaviour
     {
         Instance = this;
         InitializeManagers();
+        SelectRandomThemeColor();
+    }
+
+    private void SelectRandomThemeColor()
+    {
+        themeColor = themeColors[UnityEngine.Random.Range(0, themeColors.Length)];
     }
 
     private void OnRectTransformDimensionsChange()

@@ -10,11 +10,11 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 4bbcee89ca4d00349b0f0578b865293a, type: 3}
-  m_Name: CollectItemsWinCondition
+  m_Name: CollectItemsWinCondition2
   m_EditorClassIdentifier: 
   goalUIPrefab: {fileID: 2676076391045398041, guid: a1cd1842d5e45c0479cb7c3db4639668, type: 3}
   requiredItems:
   - itemType: {fileID: 11400000, guid: befa444f40e0d084d9e21afd1654bf6b, type: 2}
-    requiredAmount: 1
+    requiredAmount: 3
   - itemType: {fileID: 11400000, guid: 6a40cbf75a95f504d9fd5ea530e09006, type: 2}
-    requiredAmount: 2
+    requiredAmount: 3

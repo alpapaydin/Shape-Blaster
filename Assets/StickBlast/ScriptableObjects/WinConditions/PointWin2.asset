@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 5f79adf4d26e24f45b2d2755ffcd6304, type: 3}
-  m_Name: PointWinCondition
+  m_Name: PointWin2
   m_EditorClassIdentifier: 
   goalUIPrefab: {fileID: 5258833810136532255, guid: e65a03bee06a103428a6cbb14c2eb9cd, type: 3}
-  pointsToWin: 100
+  pointsToWin: 333

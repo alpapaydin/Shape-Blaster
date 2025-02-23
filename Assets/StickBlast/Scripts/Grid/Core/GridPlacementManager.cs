@@ -43,6 +43,9 @@ namespace StickBlast.Grid
 
         private void HighlightValidConnections(Vector2Int origin, StickData stick, Vector2 centerOffset)
         {
+            Color transparentThemeColor = state.ThemeColor;
+            transparentThemeColor.a = 0.6f;
+
             foreach (var segment in stick.segments)
             {
                 Vector2Int start = origin + segment.start - Vector2Int.RoundToInt(centerOffset);
@@ -53,9 +56,9 @@ namespace StickBlast.Grid
                     Connection conn = connectionManager.GetConnection(start, end);
                     if (conn != null && !conn.IsOccupied)
                     {
-                        state.Dots[start.x, start.y].Highlight(state.ThemeColor);
-                        state.Dots[end.x, end.y].Highlight(state.ThemeColor);
-                        conn.Highlight(state.ThemeColor);
+                        state.Dots[start.x, start.y].Highlight(transparentThemeColor);
+                        state.Dots[end.x, end.y].Highlight(transparentThemeColor);
+                        conn.Highlight(transparentThemeColor);
                     }
                 }
             }
