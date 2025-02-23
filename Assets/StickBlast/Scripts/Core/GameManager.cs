@@ -67,7 +67,7 @@ public class GameManager : MonoBehaviour
         soundManager.PlayBGM("bgm");
         if (LevelManager.Instance != null)
         {
-            LevelManager.Instance.LoadNextLevel();
+            LevelManager.Instance.StartGame();
         }
     }
 

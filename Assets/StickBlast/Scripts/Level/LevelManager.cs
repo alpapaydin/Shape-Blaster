@@ -72,10 +72,17 @@ namespace StickBlast.Level
 
         public void LoadNextLevel()
         {
-            currentLevelIndex++;
-            if (currentLevelIndex >= levels.Length)
+            if (currentLevelIndex == -1)
             {
                 currentLevelIndex = 0;
+            }
+            else
+            {
+                currentLevelIndex++;
+                if (currentLevelIndex >= levels.Length)
+                {
+                    currentLevelIndex = 0;
+                }
             }
             SaveCurrentLevel();
             GameManager.Instance.CurrentState = GameManager.GameState.Playing;
@@ -95,6 +102,18 @@ namespace StickBlast.Level
             currentLevelIndex = index;
             SaveCurrentLevel();
             StartCoroutine(LoadLevelRoutine());
+        }
+
+        public void StartGame()
+        {
+            if (currentLevelIndex == -1)
+            {
+                LoadNextLevel();
+            }
+            else
+            {
+                LoadLevelByIndex(currentLevelIndex);
+            }
         }
 
         private System.Collections.IEnumerator LoadLevelRoutine()
