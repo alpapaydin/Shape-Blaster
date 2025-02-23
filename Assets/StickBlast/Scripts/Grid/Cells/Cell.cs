@@ -20,6 +20,7 @@ public class Cell : MonoBehaviour
     private Color fillColor;
     private Color blastColor;
     private GameObject collectible;
+    private ItemType collectibleType;
 
     private void Awake()
     {
@@ -192,6 +193,16 @@ public class Cell : MonoBehaviour
         }
     }
 
+    public void SetCollectible(GameObject collectiblePrefab, ItemType itemType)
+    {
+        if (collectible == null && !isComplete)
+        {
+            collectible = Instantiate(collectiblePrefab, transform);
+            collectible.transform.localPosition = Vector3.zero;
+            collectibleType = itemType;
+        }
+    }
+
     public void CollectItem()
     {
         if (collectible != null)
@@ -199,7 +210,7 @@ public class Cell : MonoBehaviour
             var winCondition = FindObjectOfType<LevelManager>().CurrentLevel.winCondition as CollectItemsWinCondition;
             if (winCondition != null)
             {
-                winCondition.CollectItem();
+                winCondition.CollectItem(collectibleType);
                 Destroy(collectible);
                 collectible = null;
             }

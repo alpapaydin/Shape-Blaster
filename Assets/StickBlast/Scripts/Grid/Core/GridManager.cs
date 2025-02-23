@@ -33,9 +33,10 @@ public class GridManager : MonoBehaviour
     
     private int width = 6;
     private int height = 6;
-
+    public static GridManager Instance { get; private set; }
     private void Awake()
     {
+        Instance = this;
         InitializeManagers();
     }
 
@@ -141,4 +142,6 @@ public class GridManager : MonoBehaviour
     {
         return validator.IsConnectionOccupied(start, end);
     }
+
+    public Cell[,] Cells => state.Cells;
 }

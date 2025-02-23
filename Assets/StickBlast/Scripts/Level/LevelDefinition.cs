@@ -20,7 +20,13 @@ public class LevelDefinition : ScriptableObject
 
     [Header("Collectible Settings")]
     public bool hasCollectibles;
-    public GameObject collectiblePrefab;
-    [Range(0f, 1f)]
-    public float collectibleSpawnChance = 0.3f;
+    [System.Serializable]
+    public class CollectibleSetting
+    {
+        public ItemType itemType;
+        public GameObject prefab;
+        [Range(0f, 1f)]
+        public float spawnChance = 0.3f;
+    }
+    public CollectibleSetting[] collectibleSettings;
 }

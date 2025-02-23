@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 using StickBlast.Sticks;
+using System.Collections;
 
 public class StickSpawner : MonoBehaviour
 {
@@ -11,6 +12,8 @@ public class StickSpawner : MonoBehaviour
     [SerializeField] private StickDefinition[] availableSticks;
     [SerializeField] private float previewScaleMultiplier = 0.5f;
     [SerializeField] private float dragScaleMultiplier = 1f;
+    [SerializeField] private float slideInDuration = 0.5f;
+    [SerializeField] private float delayBetweenSticks = 0.2f;
 
     private Vector2[] slotPositions;
     private bool[] occupiedSlots;
@@ -43,13 +46,18 @@ public class StickSpawner : MonoBehaviour
 
     private void SpawnInitialSticks()
     {
+        SpawnNewStickGroup();
+    }
+
+    private void SpawnNewStickGroup()
+    {
         for (int i = 0; i < maxSticks; i++)
         {
-            SpawnRandomStick();
+            SpawnRandomStickWithAnimation(i);
         }
     }
 
-    private void SpawnRandomStick()
+    private void SpawnRandomStickWithAnimation(int index)
     {
         int slotIndex = -1;
         for (int i = 0; i < maxSticks; i++)
@@ -69,7 +77,7 @@ public class StickSpawner : MonoBehaviour
         float slotHeight = containerRect.rect.height;
         
         RectTransform rect = stickUI.GetComponent<RectTransform>();
-        rect.anchoredPosition = slotPositions[slotIndex];
+        rect.anchoredPosition = new Vector2(containerRect.rect.width, slotPositions[slotIndex].y);
         rect.sizeDelta = new Vector2(slotWidth, slotHeight);
         
         StickDraggable dragHandler = stickUI.GetComponent<StickDraggable>();
@@ -79,7 +87,52 @@ public class StickSpawner : MonoBehaviour
         dragHandler.SetCanvas(canvas);
         dragHandler.SetSlotIndex(slotIndex);
 
+        StartCoroutine(SlideStickToPosition(rect, slotPositions[slotIndex], index));
         occupiedSlots[slotIndex] = true;
+    }
+
+    private IEnumerator SlideStickToPosition(RectTransform rect, Vector2 targetPos, int index)
+    {
+        yield return new WaitForSeconds(index * delayBetweenSticks);
+
+        Vector2 startPos = rect.anchoredPosition;
+        float elapsedTime = 0;
+
+        while (elapsedTime < slideInDuration)
+        {
+            elapsedTime += Time.deltaTime;
+            float t = elapsedTime / slideInDuration;
+            
+            t = BounceEaseOut(t);
+            
+            rect.anchoredPosition = Vector2.Lerp(startPos, targetPos, t);
+            yield return null;
+        }
+
+        rect.anchoredPosition = targetPos;
+    }
+
+    private float BounceEaseOut(float t)
+    {
+        if (t < 1f/2.75f)
+        {
+            return 7.5625f * t * t;
+        }
+        else if (t < 2f/2.75f)
+        {
+            t -= 1.5f/2.75f;
+            return 7.5625f * t * t + 0.75f;
+        }
+        else if (t < 2.5f/2.75f)
+        {
+            t -= 2.25f/2.75f;
+            return 7.5625f * t * t + 0.9375f;
+        }
+        else
+        {
+            t -= 2.625f/2.75f;
+            return 7.5625f * t * t + 0.984375f;
+        }
     }
 
     private StickData GetRandomStickData()
@@ -122,8 +175,23 @@ public class StickSpawner : MonoBehaviour
     public void OnStickPlaced(int slotIndex)
     {
         occupiedSlots[slotIndex] = false;
-        SpawnRandomStick();
+        
+        if (AreAllSlotsEmpty())
+        {
+            SpawnNewStickGroup();
+        }
+        
         CheckGameOver();
+    }
+
+    private bool AreAllSlotsEmpty()
+    {
+        for (int i = 0; i < maxSticks; i++)
+        {
+            if (occupiedSlots[i])
+                return false;
+        }
+        return true;
     }
 
     public void CheckGameOver(StickDraggable currentStick)

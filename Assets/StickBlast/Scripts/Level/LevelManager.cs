@@ -150,12 +150,17 @@ namespace StickBlast.Level
 
         private void SpawnCollectibles()
         {
-            var cells = FindObjectsOfType<Cell>();
-            foreach (var cell in cells)
+            if (!CurrentLevel.hasCollectibles || CurrentLevel.collectibleSettings == null) return;
+
+            foreach (var cell in GridManager.Instance.Cells)
             {
-                if (Random.value < CurrentLevel.collectibleSpawnChance)
+                foreach (var collectible in CurrentLevel.collectibleSettings)
                 {
-                    cell.SpawnCollectible(CurrentLevel.collectiblePrefab);
+                    if (Random.value < collectible.spawnChance)
+                    {
+                        cell.SetCollectible(collectible.prefab, collectible.itemType);
+                        break; // Only spawn one collectible per cell
+                    }
                 }
             }
         }
