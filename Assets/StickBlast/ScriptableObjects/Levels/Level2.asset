@@ -12,8 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: baa34ac5dcbd5a440b7e19c36e6d375b, type: 3}
   m_Name: Level2
   m_EditorClassIdentifier: 
-  width: 6
-  height: 6
+  width: 4
+  height: 12
   winCondition: {fileID: 11400000, guid: 554b92bfe36611b44a93960e4bc81344, type: 2}
   availableSticks:
   - {fileID: 11400000, guid: 522d8134b71cc954f9103d53645439ba, type: 2}

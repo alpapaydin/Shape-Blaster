@@ -35,20 +35,31 @@ namespace StickBlast.Grid
 
         private float CalculateGridScale()
         {
-            float worldWidth = state.Width - 1;
-            float worldHeight = state.Height - 1;
+            float gridWidth = state.Width - 1;
+            float gridHeight = state.Height - 1;
             
             float screenAspect = (float)Screen.width / Screen.height;
             float cameraHeight = mainCamera.orthographicSize * 2f;
             float cameraWidth = cameraHeight * screenAspect;
 
-            float availableWidth = cameraWidth - (padding * 2f);
-            float availableHeight = cameraHeight - (padding * 2f);
+            float horizontalPaddingPercent = 0.1f;
+            float verticalPaddingPercent = 0.20f;
 
-            float scaleX = availableWidth / worldWidth;
-            float scaleY = availableHeight / worldHeight;
+            float horizontalPadding = cameraWidth * horizontalPaddingPercent;
+            float verticalPadding = cameraHeight * verticalPaddingPercent;
 
-            return Mathf.Min(scaleX, scaleY);
+            float availableWidth = cameraWidth - (horizontalPadding * 2f);
+            float availableHeight = cameraHeight - (verticalPadding * 2f);
+
+            float scale = availableWidth / gridWidth;
+
+            float resultingHeight = gridHeight * scale;
+            if (resultingHeight > availableHeight)
+            {
+                scale = availableHeight / gridHeight;
+            }
+
+            return scale;
         }
 
         private Vector3 CalculateGridPosition()
