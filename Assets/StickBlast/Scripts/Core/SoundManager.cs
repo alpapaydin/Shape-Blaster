@@ -181,6 +181,12 @@ public class SoundManager : MonoBehaviour
         }
     }
 
+    public void PlayRandomBGM()
+    {
+        string randomBGM = UnityEngine.Random.value < 0.5f ? "bgm1" : "bgm2";
+        PlayBGM(randomBGM);
+    }
+
     public void StopSound(string soundName)
     {
         if (!soundDictionary.TryGetValue(soundName, out Sound sound)) return;

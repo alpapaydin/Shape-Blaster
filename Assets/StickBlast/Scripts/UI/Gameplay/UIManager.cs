@@ -18,6 +18,7 @@ public class UIManager : MonoBehaviour
     {
         canvas = GetComponent<Canvas>();
         GameManager.Instance.SetUIManager(this);
+        SoundManager.Instance.PlayRandomBGM();
     }
 
     public void SetupGoalUI(WinCondition winCondition)

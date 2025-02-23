@@ -4,6 +4,9 @@ using UnityEngine;
 
 public class MenuUI : MonoBehaviour
 {
+    private void Start() 
+        {SoundManager.Instance.PlayBGM("menubgm");}
+
     public void LogoSplash()
         {SoundManager.Instance.PlaySound("click");}
 

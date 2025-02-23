@@ -281,6 +281,24 @@ MonoBehaviour:
     pitch: 1
     loop: 0
     source: {fileID: 0}
+  - name: menubgm
+    clip: {fileID: 8300000, guid: a5ea76ce9945e8045b5a5c97a198ab1f, type: 3}
+    volume: 0.777
+    pitch: 1
+    loop: 0
+    source: {fileID: 0}
+  - name: bgm1
+    clip: {fileID: 8300000, guid: d6c9a868e9c2b954fbb907ea5a6833dd, type: 3}
+    volume: 0.777
+    pitch: 1
+    loop: 0
+    source: {fileID: 0}
+  - name: bgm2
+    clip: {fileID: 8300000, guid: 8e095d728ea7e3b489853201ed5f93ce, type: 3}
+    volume: 0.777
+    pitch: 1
+    loop: 0
+    source: {fileID: 0}
   poolSize: 10
   masterVolume: 1
   sfxVolume: 1
