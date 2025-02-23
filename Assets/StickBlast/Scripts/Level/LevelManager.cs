@@ -106,6 +106,7 @@ namespace StickBlast.Level
 
         public void StartGame()
         {
+            SoundManager.Instance.PlaySound("startGame");
             if (currentLevelIndex == -1)
             {
                 LoadNextLevel();

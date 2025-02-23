@@ -102,6 +102,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e7f8e890d6752fe49bdcd1bde293ed4a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  cellFillMaterialPrefab: {fileID: 2100000, guid: 37f5770fe16a86144bfcd56c4827bdd9, type: 2}
   blastPreviewMaterialPrefab: {fileID: 2100000, guid: 142bbca21ee1c0348bfd35499f2d058d, type: 2}
   blastInnerMaterialPrefab: {fileID: 2100000, guid: 801b334fe4a068a4d94719077a96084e, type: 2}
   blastEffectPrefab: {fileID: 4073973658897037531, guid: 348c41e3a9ffce845bb7146247a313f7, type: 3}

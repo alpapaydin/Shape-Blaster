@@ -4,6 +4,8 @@ using StickBlast.Level;
 
 public class Cell : MonoBehaviour
 {
+    [Header("Materials")]
+    [SerializeField] private Material cellFillMaterialPrefab;
     [SerializeField] private Material blastPreviewMaterialPrefab;
     [SerializeField] private Material blastInnerMaterialPrefab;
     [SerializeField] private GameObject blastEffectPrefab;
@@ -46,9 +48,7 @@ public class Cell : MonoBehaviour
         {
             outerGlowRenderer.sortingLayerName = "Grid";
             outerGlowRenderer.sortingOrder = 2;
-            glowMaterial = blastPreviewMaterialPrefab != null ? 
-                new Material(blastPreviewMaterialPrefab) : 
-                new Material(Shader.Find("Custom/CellBlastPreview"));
+            glowMaterial = new Material(blastPreviewMaterialPrefab);
             outerGlowRenderer.material = glowMaterial;
             outerGlowRenderer.enabled = false;
             
@@ -56,18 +56,14 @@ public class Cell : MonoBehaviour
             glowMaterial.SetColor("_Color", Color.clear);
         }
 
-        innerBlastMaterial = blastInnerMaterialPrefab != null ? 
-            new Material(blastInnerMaterialPrefab) : 
-            new Material(Shader.Find("Custom/CellBlastInner"));
+        innerBlastMaterial = new Material(blastInnerMaterialPrefab);
         innerBlastMaterial.SetFloat("_FillAmount", 0);
     }
 
     private void InitializeMaterials()
     {
-        fillMaterial = new Material(Shader.Find("Custom/CellFill"));
-        blastMaterial = blastPreviewMaterialPrefab != null ? 
-            new Material(blastPreviewMaterialPrefab) : 
-            new Material(Shader.Find("Custom/CellBlastPreview"));
+        fillMaterial = new Material(cellFillMaterialPrefab);
+        blastMaterial = new Material(blastPreviewMaterialPrefab);
         
         mainRenderer.material = fillMaterial;
         fillMaterial.SetFloat("_FillAmount", 0);

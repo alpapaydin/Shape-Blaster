@@ -275,6 +275,12 @@ MonoBehaviour:
     pitch: 1
     loop: 0
     source: {fileID: 0}
+  - name: startGame
+    clip: {fileID: 8300000, guid: fec3d5d94829ff84fadc23c22170c45f, type: 3}
+    volume: 1
+    pitch: 1
+    loop: 0
+    source: {fileID: 0}
   poolSize: 10
   masterVolume: 1
   sfxVolume: 1
