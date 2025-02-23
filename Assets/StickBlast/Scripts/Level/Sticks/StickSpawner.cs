@@ -110,6 +110,12 @@ public class StickSpawner : MonoBehaviour
         }
 
         rect.anchoredPosition = targetPos;
+        
+        var stickDraggable = rect.GetComponent<StickDraggable>();
+        if (stickDraggable != null)
+        {
+            stickDraggable.UpdateSlotPosition(targetPos);
+        }
     }
 
     private float BounceEaseOut(float t)

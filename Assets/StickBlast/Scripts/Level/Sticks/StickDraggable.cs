@@ -14,7 +14,6 @@ public class StickDraggable : MonoBehaviour, IBeginDragHandler, IDragHandler, IE
     private RectTransform rectTransform;
     private StickData stickData;
     private GridManager gridManager;
-    private Vector2 originalPosition;
     private Vector2Int currentGridPosition;
     private StickSpawner spawner;
     private int slotIndex;
@@ -28,12 +27,16 @@ public class StickDraggable : MonoBehaviour, IBeginDragHandler, IDragHandler, IE
     private float updateHighlightThreshold = 0.03f;
     private Vector2 lastHighlightPosition;
     [SerializeField] private bool useVibration = true;
+    [SerializeField] private Material stickMaterial;
+    private Vector2 slotPosition;
 
     public StickData StickData => stickData;
     
     private void Awake()
     {
         rectTransform = GetComponent<RectTransform>();
+        rectTransform.anchorMin = rectTransform.anchorMax = new Vector2(0.5f, 0.5f);
+        rectTransform.pivot = new Vector2(0.5f, 0.5f);
         gridManager = FindObjectOfType<GridManager>();
         spawner = GetComponentInParent<StickSpawner>();
         dragCamera = Camera.main;
@@ -65,6 +68,12 @@ public class StickDraggable : MonoBehaviour, IBeginDragHandler, IDragHandler, IE
     public void SetSlotIndex(int index)
     {
         slotIndex = index;
+        slotPosition = rectTransform.anchoredPosition;
+        
+        if (rectTransform != null)
+        {
+            rectTransform.anchoredPosition = slotPosition;
+        }
     }
 
     public void OnBeginDrag(PointerEventData eventData)
@@ -76,7 +85,6 @@ public class StickDraggable : MonoBehaviour, IBeginDragHandler, IDragHandler, IE
             Vibration.VibrateMedium();
         }
         isDragging = true;
-        originalPosition = rectTransform.anchoredPosition;
         currentScaleMultiplier = gridManager.GetCurrentScale() * dragScaleMultiplier * stickData.definition.scaleMultiplier;
         UpdateStickVisual();
         
@@ -141,10 +149,8 @@ public class StickDraggable : MonoBehaviour, IBeginDragHandler, IDragHandler, IE
         }
         else
         {
-            rectTransform.anchoredPosition = originalPosition;
-            currentScaleMultiplier = baseScale * previewScaleMultiplier;
-            UpdateStickVisual();
             isDragging = false;
+            ReturnToSlot();
         }
         
         SoundManager.Instance.StopSound("highlightBlast");
@@ -198,12 +204,21 @@ public class StickDraggable : MonoBehaviour, IBeginDragHandler, IDragHandler, IE
         }
         else
         {
-            rectTransform.anchoredPosition = originalPosition;
             isDragging = false;
+            ReturnToSlot();
         }
     }
 
-    private void UpdateStickVisual()
+    private void ReturnToSlot()
+    {
+        rectTransform.anchorMin = rectTransform.anchorMax = new Vector2(0.5f, 0.5f);
+        rectTransform.pivot = new Vector2(0.5f, 0.5f);
+        rectTransform.anchoredPosition = slotPosition;
+        currentScaleMultiplier = baseScale * previewScaleMultiplier;
+        UpdateStickVisual(false);
+    }
+
+    private void UpdateStickVisual(bool updatePosition = true)
     {
         foreach (Transform child in transform)
         {
@@ -217,8 +232,11 @@ public class StickDraggable : MonoBehaviour, IBeginDragHandler, IDragHandler, IE
         CreateStickParts(container, currentScaleMultiplier);
         SetRectToFill(dragArea);
         
-        float halfGridUnit = 0.5f;
-        gridOffset = new Vector2(-halfGridUnit, -halfGridUnit);
+        if (updatePosition)
+        {
+            float halfGridUnit = 0.5f;
+            gridOffset = new Vector2(-halfGridUnit, -halfGridUnit);
+        }
     }
 
     private RectTransform CreateContainer(string name)
@@ -253,6 +271,10 @@ public class StickDraggable : MonoBehaviour, IBeginDragHandler, IDragHandler, IE
             image.sprite = part.sprite;
             image.SetNativeSize();
             image.color = gridManager.GetThemeColor();
+            if (stickMaterial != null)
+            {
+                image.material = stickMaterial;
+            }
 
             var rect = partObj.GetComponent<RectTransform>();
             rect.pivot = new Vector2(0.5f, 0.5f);
@@ -320,5 +342,16 @@ public class StickDraggable : MonoBehaviour, IBeginDragHandler, IDragHandler, IE
         
         float angle = -(int)stickData.orientation;
         return Quaternion.Euler(0, 0, angle) * weightedCenterCache;
+    }
+
+    public void UpdateSlotPosition(Vector2 newPosition)
+    {
+        slotPosition = newPosition;
+        if (!isDragging)
+        {
+            rectTransform.anchorMin = rectTransform.anchorMax = new Vector2(0.5f, 0.5f);
+            rectTransform.pivot = new Vector2(0.5f, 0.5f);
+            rectTransform.anchoredPosition = slotPosition;
+        }
     }
 }

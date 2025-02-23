@@ -58,6 +58,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   canvas: {fileID: 0}
-  dragOffset: 100
+  touchOffset: {x: 0, y: 250}
   previewScaleMultiplier: 0.1
   dragScaleMultiplier: 0.1
+  useVibration: 1
+  stickMaterial: {fileID: 0}

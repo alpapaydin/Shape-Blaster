@@ -7,8 +7,8 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: CellBlastHighlight
-  m_Shader: {fileID: 4800000, guid: 5394e73fcd2719c46a47610760507a0a, type: 3}
+  m_Name: UIShadow
+  m_Shader: {fileID: 4800000, guid: e260cfa7296ee7642b167f1eb5be5023, type: 3}
   m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0
   m_ValidKeywords: []
@@ -16,7 +16,7 @@ Material:
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
-  m_CustomRenderQueue: 2000
+  m_CustomRenderQueue: -1
   stringTagMap: {}
   disabledShaderPasses: []
   m_LockedProperties: 
@@ -41,25 +41,9 @@ Material:
         m_Offset: {x: 0, y: 0}
     m_Ints: []
     m_Floats:
-    - _EdgePower: 0.65
-    - _EdgeSoftness: 0.337
     - _EnableExternalAlpha: 0
-    - _FadeDistance: 0.343
-    - _FillAmount: 1
-    - _FlowSpeed: 0.841
-    - _GlobalTime: 0
-    - _GlowIntensity: 3
-    - _GlowRadius: 0.516
-    - _NoiseScale: 6.17
-    - _ParticleCount: 10
-    - _ParticleOverflow: 0.911
-    - _ParticleSize: 0.0824
-    - _ParticleSpeed: 0.344
-    - _ParticleSpread: 2.033
-    - _PulseSpeed: 3.35
     m_Colors:
-    - _Color: {r: 0.9103774, g: 0.25765392, b: 0.25765392, a: 0}
+    - _Color: {r: 1, g: 1, b: 1, a: 1}
     - _Flip: {r: 1, g: 1, b: 1, a: 1}
-    - _GlowColor: {r: 0.8352941, g: 0.48983836, b: 0.11764705, a: 1}
     - _RendererColor: {r: 1, g: 1, b: 1, a: 1}
   m_BuildTextureStacks: []
