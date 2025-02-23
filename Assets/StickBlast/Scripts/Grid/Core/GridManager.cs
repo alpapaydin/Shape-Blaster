@@ -2,6 +2,7 @@ using UnityEngine;
 using StickBlast.Grid;
 using StickBlast.Sticks;
 using StickBlast.Level;
+using System;
 
 public class GridManager : MonoBehaviour
 {
@@ -33,6 +34,7 @@ public class GridManager : MonoBehaviour
     private int width = 6;
     private int height = 6;
     public static GridManager Instance { get; private set; }
+    public static event Action OnGridResized;
     private void Awake()
     {
         Instance = this;
@@ -71,6 +73,7 @@ public class GridManager : MonoBehaviour
         InitializeManagers();
         initializer.InitializeGrid();
         layoutController.UpdateLayout();
+        OnGridResized?.Invoke();
         
         if (level.hasCollectibles && level.winCondition is CollectItemsWinCondition)
         {

@@ -17,10 +17,16 @@ public class Connection : MonoBehaviour
     {
         lineRenderer = GetComponent<LineRenderer>();
         SetupLine();
+        GridManager.OnGridResized += SetLineRendererPositions;
         if (barSprite != null)
         {
             barSprite.color = Color.clear;
         }
+    }
+
+    private void Destroy()
+    {
+        GridManager.OnGridResized -= SetLineRendererPositions;
     }
 
     private void SetupLine()
@@ -36,7 +42,7 @@ public class Connection : MonoBehaviour
         lineRenderer.sortingOrder = 0;
     }
 
-    private void Update()
+    private void SetLineRendererPositions()
     {
         if (StartDot != null && EndDot != null)
         {
@@ -51,8 +57,7 @@ public class Connection : MonoBehaviour
         EndDot = end;
         IsOccupied = false;
         
-        lineRenderer.SetPosition(0, start.transform.position);
-        lineRenderer.SetPosition(1, end.transform.position);
+        SetLineRendererPositions();
 
         if (barSprite != null)
         {
