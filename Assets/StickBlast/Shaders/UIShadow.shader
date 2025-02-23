@@ -1,14 +1,12 @@
-Shader "Custom/UIShadow"
+Shader "Custom/UIGradientLight"
 {
     Properties
     {
         [PerRendererData] _MainTex ("Sprite Texture", 2D) = "white" {}
         _Color ("Tint", Color) = (1,1,1,1)
-        
-        _ShadowColor ("Shadow Color", Color) = (0,0,0,1)
-        _ShadowOffset ("Shadow Offset", Vector) = (0,-1,0,0)
-        _ShadowSoftness ("Shadow Softness", Range(0,1)) = 0.5
-        
+        _GlowColor ("Glow Color", Color) = (1,1,1,0.2)
+        _GradientAngle ("Gradient Angle", Range(0, 360)) = 45
+        _GradientIntensity ("Gradient Intensity", Range(0, 1)) = 0.5
         [Toggle(UNITY_UI_ALPHACLIP)] _UseClipRect ("Use Clip Rect", Float) = 1
     }
 
@@ -34,61 +32,63 @@ Shader "Custom/UIShadow"
             CGPROGRAM
             #pragma vertex vert
             #pragma fragment frag
-            #pragma target 2.0
 
             #include "UnityCG.cginc"
             #include "UnityUI.cginc"
 
             struct appdata_t
             {
-                float4 vertex   : POSITION;
-                float4 color    : COLOR;
+                float4 vertex : POSITION;
+                float4 color : COLOR;
                 float2 texcoord : TEXCOORD0;
+                UNITY_VERTEX_INPUT_INSTANCE_ID
             };
 
             struct v2f
             {
-                float4 vertex   : SV_POSITION;
-                fixed4 color    : COLOR;
+                float4 vertex : SV_POSITION;
+                fixed4 color : COLOR;
                 float2 texcoord : TEXCOORD0;
                 float4 worldPosition : TEXCOORD1;
+                float4 screenPos : TEXCOORD2;
+                UNITY_VERTEX_OUTPUT_STEREO
             };
 
-            fixed4 _Color;
-            fixed4 _ShadowColor;
-            float4 _ShadowOffset;
-            float _ShadowSoftness;
-            float4 _ClipRect;
             sampler2D _MainTex;
+            fixed4 _Color;
+            fixed4 _GlowColor;
+            float _GradientAngle;
+            float _GradientIntensity;
+            float4 _ClipRect;
 
-            v2f vert(appdata_t IN)
+            v2f vert(appdata_t v)
             {
                 v2f OUT;
-                OUT.worldPosition = IN.vertex;
+                UNITY_SETUP_INSTANCE_ID(v);
+                UNITY_INITIALIZE_VERTEX_OUTPUT_STEREO(OUT);
+                OUT.worldPosition = v.vertex;
                 OUT.vertex = UnityObjectToClipPos(OUT.worldPosition);
-                OUT.texcoord = IN.texcoord;
-                OUT.color = IN.color * _Color;
+                OUT.screenPos = ComputeScreenPos(OUT.vertex);
+                OUT.texcoord = v.texcoord;
+                OUT.color = v.color * _Color;
                 return OUT;
             }
 
             fixed4 frag(v2f IN) : SV_Target
             {
-                // Sample the texture for both main image and shadow
-                half4 mainColor = tex2D(_MainTex, IN.texcoord) * IN.color;
-                half4 shadowColor = tex2D(_MainTex, IN.texcoord - _ShadowOffset.xy) * _ShadowColor;
+                half4 color = tex2D(_MainTex, IN.texcoord) * IN.color;
                 
-                // Apply softness to shadow
-                shadowColor.a *= smoothstep(0, _ShadowSoftness, shadowColor.a);
+                float2 screenUV = IN.screenPos.xy / IN.screenPos.w;
+                float angle = _GradientAngle * (3.1415926 / 180.0);
+                float2 gradientDir = float2(cos(angle), sin(angle));
+                float gradient = dot(screenUV - 0.5, gradientDir) + 0.5;
                 
-                // Blend shadow and main color
-                half4 finalColor = mainColor;
-                finalColor.rgb = lerp(shadowColor.rgb * shadowColor.a, mainColor.rgb, mainColor.a);
-                finalColor.a = max(shadowColor.a, mainColor.a);
+                half4 gradientColor = lerp(half4(1,1,1,0), _GlowColor, gradient);
+                color.rgb += gradientColor.rgb * _GradientIntensity * color.a;
                 
-                // Apply clip rect
-                finalColor.a *= UnityGet2DClipping(IN.worldPosition.xy, _ClipRect);
+                color.a *= UnityGet2DClipping(IN.worldPosition.xy, _ClipRect);
                 
-                return finalColor;
+                return color;
             }
             ENDCG
         }

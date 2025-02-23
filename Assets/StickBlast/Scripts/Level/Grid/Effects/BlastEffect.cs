@@ -14,6 +14,7 @@ public class BlastEffect : MonoBehaviour
     {
         material = GetComponent<SpriteRenderer>().material;
         material.SetFloat(IsVerticalProperty, isVertical ? 1f : 0f);
+        material.SetVector("_Color", GridManager.Instance.GetThemeColor());
         startTime = Time.time;
     }
 

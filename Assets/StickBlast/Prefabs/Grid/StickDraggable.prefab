@@ -62,4 +62,4 @@ MonoBehaviour:
   previewScaleMultiplier: 0.1
   dragScaleMultiplier: 0.1
   useVibration: 1
-  stickMaterial: {fileID: 0}
+  stickMaterial: {fileID: 2100000, guid: 4ed1dba6b45797d46b9787da477e4eeb, type: 2}
