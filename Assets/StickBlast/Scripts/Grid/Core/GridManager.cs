@@ -141,12 +141,4 @@ public class GridManager : MonoBehaviour
     {
         return validator.IsConnectionOccupied(start, end);
     }
-
-    public void CheckWinCondition()
-    {
-        if (false)
-        {
-            GameManager.Instance.WinGame();
-        }
-    }
 }

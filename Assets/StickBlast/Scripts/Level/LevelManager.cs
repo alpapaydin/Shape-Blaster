@@ -109,6 +109,7 @@ namespace StickBlast.Level
 
             CurrentLevel = levels[currentLevelIndex];
             gridManager = FindObjectOfType<GridManager>();
+            
             if (gridManager != null)
             {
                 gridManager.InitializeFromLevel(CurrentLevel);
@@ -119,6 +120,12 @@ namespace StickBlast.Level
                 }
 
                 CurrentLevel.winCondition.Initialize();
+                
+                var uiManager = FindObjectOfType<UIManager>();
+                if (uiManager != null)
+                {
+                    uiManager.UpdateProgressText(CurrentLevel.winCondition.GetProgressText());
+                }
             }
         }
 
@@ -139,6 +146,11 @@ namespace StickBlast.Level
             if (CurrentLevel.winCondition is PointWinCondition pointWin)
             {
                 pointWin.AddPoints(points);
+                var uiManager = FindObjectOfType<UIManager>();
+                if (uiManager != null)
+                {
+                    uiManager.UpdateProgressText(CurrentLevel.winCondition.GetProgressText());
+                }
             }
         }
 

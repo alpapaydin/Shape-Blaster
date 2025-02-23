@@ -1,6 +1,8 @@
 using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;
+using StickBlast.Level;
+using static System.Math;
 
 namespace StickBlast.Grid
 {
@@ -46,7 +48,8 @@ namespace StickBlast.Grid
 
             comboCount++;
             SoundManager.Instance.PlaySoundDelayed("blast", allBlastPositions.Count, 0.1f, 0.7f);
-            Debug.Log($"Combo #{comboCount}: Found {allBlastPositions.Count} lines to blast!");
+            LevelManager.Instance.AddPoints((int)(Pow(2, allBlastPositions.Count) * 10));
+            Debug.Log($"{allBlastPositions.Count} lines to blast!");
 
             foreach (var pos in allBlastPositions)
             {

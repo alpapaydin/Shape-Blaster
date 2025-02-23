@@ -1,6 +1,7 @@
 using UnityEngine;
 using System.Collections.Generic;
 using System.Linq;
+using StickBlast.Level;
 
 namespace StickBlast.Grid
 {
@@ -29,6 +30,7 @@ namespace StickBlast.Grid
             if (isComplete)
             {
                 SoundManager.Instance.PlaySound("completeCell");
+                LevelManager.Instance.AddPoints(50);
                 state.Cells[cellPos.x, cellPos.y].SetComplete(true, true);
                 blastManager.CheckForBlast();
             }

@@ -302,6 +302,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   levels:
   - {fileID: 11400000, guid: 8762264467c5c18448beae89bf19bed0, type: 2}
+  - {fileID: 11400000, guid: 6fb694c3d95cab14684a79d67d063cae, type: 2}
   levelScene: {fileID: 102900000, guid: 8c9cfa26abfee488c85f1582747f6a02, type: 3}
   menuScene: {fileID: 102900000, guid: 497b8ec61e7de964a898000df3e8942d, type: 3}
   levelSceneName: Gameplay
@@ -644,6 +645,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2bb29353485f48a48a3d592888b45d55, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  progressText: {fileID: 0}
   losePopupPrefab: {fileID: 1915917909225865202, guid: b4d8fc55c6520ff438003e6b3c8da940, type: 3}
   winPopupPrefab: {fileID: 2911605927438514138, guid: 8cef94b9dd047d447b08ee839f4b2a93, type: 3}
 --- !u!95 &688628348

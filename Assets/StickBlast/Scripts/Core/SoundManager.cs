@@ -239,7 +239,7 @@ public class SoundManager : MonoBehaviour
     {
         if (!soundDictionary.TryGetValue(soundName, out Sound sound)) return;
 
-        if (activeDelayedSounds.TryGetValue(soundName, out Coroutine existing))
+        if (activeDelayedSounds.TryGetValue(soundName, out Coroutine existing) && existing != null)
         {
             StopCoroutine(existing);
             activeDelayedSounds.Remove(soundName);

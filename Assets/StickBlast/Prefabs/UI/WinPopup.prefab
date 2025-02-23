@@ -96,6 +96,18 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 3202700513493073393, guid: b4d8fc55c6520ff438003e6b3c8da940, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
+      value: 
+      objectReference: {fileID: 7826056647174377077}
+    - target: {fileID: 3202700513493073393, guid: b4d8fc55c6520ff438003e6b3c8da940, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
+      value: RestartLevel
+      objectReference: {fileID: 0}
+    - target: {fileID: 3202700513493073393, guid: b4d8fc55c6520ff438003e6b3c8da940, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
+      value: WinPopup, Assembly-CSharp
+      objectReference: {fileID: 0}
     - target: {fileID: 3234457892495952465, guid: b4d8fc55c6520ff438003e6b3c8da940, type: 3}
       propertyPath: m_text
       value: Next Level
@@ -108,8 +120,40 @@ PrefabInstance:
       propertyPath: loseClip
       value: 
       objectReference: {fileID: 8300000, guid: ce6ef48f281fc704495ee25c91d6a667, type: 3}
-    m_RemovedComponents: []
+    - target: {fileID: 7412040205418099835, guid: b4d8fc55c6520ff438003e6b3c8da940, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
+      value: 
+      objectReference: {fileID: 7826056647174377077}
+    - target: {fileID: 7412040205418099835, guid: b4d8fc55c6520ff438003e6b3c8da940, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
+      value: GoToMainMenu
+      objectReference: {fileID: 0}
+    m_RemovedComponents:
+    - {fileID: 5853874050881413550, guid: b4d8fc55c6520ff438003e6b3c8da940, type: 3}
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 1915917909225865202, guid: b4d8fc55c6520ff438003e6b3c8da940, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 7826056647174377077}
   m_SourcePrefab: {fileID: 100100000, guid: b4d8fc55c6520ff438003e6b3c8da940, type: 3}
+--- !u!1 &2911605927438514138 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 1915917909225865202, guid: b4d8fc55c6520ff438003e6b3c8da940, type: 3}
+  m_PrefabInstance: {fileID: 3674566785628342312}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &7826056647174377077
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2911605927438514138}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bde5f4bf716630342830a645b3eee168, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  thudClip: {fileID: 8300000, guid: a0cbe8e025e30524c9f39f47894fbaa5, type: 3}
+  loseClip: {fileID: 8300000, guid: ce6ef48f281fc704495ee25c91d6a667, type: 3}
+  tapClip: {fileID: 8300000, guid: 94a576840d5376948a8584150f8d8574, type: 3}

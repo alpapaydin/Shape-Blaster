@@ -74,7 +74,6 @@ public class GameManager : MonoBehaviour
     public void WinGame()
     {
         if (currentState != GameState.Playing) return;
-        Debug.Log("You won.");
         CurrentState = GameState.Won;
     }
 

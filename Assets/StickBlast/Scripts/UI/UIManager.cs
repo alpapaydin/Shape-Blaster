@@ -1,9 +1,11 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using TMPro;
 
 public class UIManager : MonoBehaviour
 {
+    [SerializeField] private TextMeshProUGUI progressText;
     [SerializeField] private GameObject losePopupPrefab;
     [SerializeField] private GameObject winPopupPrefab;
     
@@ -40,6 +42,14 @@ public class UIManager : MonoBehaviour
         {
             activeLosePopup = Instantiate(losePopupPrefab, canvas.transform);
             SoundManager.Instance.PlaySound("lose_popup", true);
+        }
+    }
+
+    public void UpdateProgressText(string text)
+    {
+        if (progressText != null)
+        {
+            progressText.text = text;
         }
     }
 }
