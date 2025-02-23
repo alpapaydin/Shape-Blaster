@@ -7,5 +7,6 @@ namespace StickBlast.Level
     {
         public string itemName;
         public Sprite icon;
+        public GameObject prefab;  // Moved from ItemRequirement
     }
 }

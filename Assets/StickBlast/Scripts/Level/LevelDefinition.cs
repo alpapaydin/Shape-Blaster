@@ -20,13 +20,9 @@ public class LevelDefinition : ScriptableObject
 
     [Header("Collectible Settings")]
     public bool hasCollectibles;
-    [System.Serializable]
-    public class CollectibleSetting
+
+    private void OnValidate()
     {
-        public ItemType itemType;
-        public GameObject prefab;
-        [Range(0f, 1f)]
-        public float spawnChance = 0.3f;
+        hasCollectibles = winCondition is CollectItemsWinCondition;
     }
-    public CollectibleSetting[] collectibleSettings;
 }

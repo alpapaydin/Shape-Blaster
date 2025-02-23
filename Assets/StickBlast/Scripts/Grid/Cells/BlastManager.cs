@@ -49,7 +49,6 @@ namespace StickBlast.Grid
             comboCount++;
             SoundManager.Instance.PlaySoundDelayed("blast", allBlastPositions.Count, 0.1f, 0.7f);
             LevelManager.Instance.AddPoints((int)(Pow(2, allBlastPositions.Count) * 10));
-            Debug.Log($"{allBlastPositions.Count} lines to blast!");
 
             foreach (var pos in allBlastPositions)
             {
@@ -90,6 +89,7 @@ namespace StickBlast.Grid
                     if (cell != null)
                     {
                         cell.SetComplete(false);
+                        cell.CollectItem();
                     }
                 }
             }

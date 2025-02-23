@@ -23,6 +23,7 @@ namespace StickBlast.UI
 
             if (current >= required)
             {
+                SoundManager.Instance.PlaySound("objectiveComplete");
                 completedTick.SetActive(true);
                 remainingCount.gameObject.SetActive(false);
             }

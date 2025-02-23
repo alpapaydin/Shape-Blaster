@@ -257,6 +257,24 @@ MonoBehaviour:
     pitch: 1
     loop: 0
     source: {fileID: 0}
+  - name: swoosh
+    clip: {fileID: 8300000, guid: 7c7306953b8dee046908779fdf4acae9, type: 3}
+    volume: 1
+    pitch: 1
+    loop: 0
+    source: {fileID: 0}
+  - name: itemCollected
+    clip: {fileID: 8300000, guid: ff8bcd7a72f004143882e3691f889d8e, type: 3}
+    volume: 1
+    pitch: 1
+    loop: 0
+    source: {fileID: 0}
+  - name: objectiveComplete
+    clip: {fileID: 8300000, guid: fec3d5d94829ff84fadc23c22170c45f, type: 3}
+    volume: 1
+    pitch: 1
+    loop: 0
+    source: {fileID: 0}
   poolSize: 10
   masterVolume: 1
   sfxVolume: 1
@@ -645,7 +663,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2bb29353485f48a48a3d592888b45d55, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  progressText: {fileID: 0}
+  goalPanel: {fileID: 0}
   losePopupPrefab: {fileID: 1915917909225865202, guid: b4d8fc55c6520ff438003e6b3c8da940, type: 3}
   winPopupPrefab: {fileID: 2911605927438514138, guid: 8cef94b9dd047d447b08ee839f4b2a93, type: 3}
 --- !u!95 &688628348

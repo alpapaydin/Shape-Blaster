@@ -1,6 +1,7 @@
 using UnityEngine;
 using StickBlast.Grid;
 using StickBlast.Sticks;
+using StickBlast.Level;
 
 public class GridManager : MonoBehaviour
 {
@@ -18,9 +19,6 @@ public class GridManager : MonoBehaviour
     [SerializeField] private Color themeColor = Color.green;
     [SerializeField] private Color emptyColor = Color.blue;
 
-    [Header("Debug")]
-    [SerializeField] private bool enableDebugPattern = false;
-
     // Core components
     private GridState state;
     private GridInitializer initializer;
@@ -30,6 +28,7 @@ public class GridManager : MonoBehaviour
     private BlastManager blastManager;
     private PlacementManager placementManager;
     private GridValidator validator;
+    private GridItemSpawner itemSpawner;
     
     private int width = 6;
     private int height = 6;
@@ -38,15 +37,6 @@ public class GridManager : MonoBehaviour
     {
         Instance = this;
         InitializeManagers();
-    }
-
-    private void Start()
-    {
-        if (enableDebugPattern)
-        {
-            var debugger = new GridDebugger(state, connectionManager, cellManager);
-            debugger.FillTestPattern();
-        }
     }
 
     private void OnRectTransformDimensionsChange()
@@ -66,6 +56,12 @@ public class GridManager : MonoBehaviour
         validator = new GridValidator(state, connectionManager);
         placementManager = new PlacementManager(state, validator, connectionManager, cellManager, blastManager);
         blastManager = new BlastManager(state, connectionManager, cellManager);
+        itemSpawner = gameObject.AddComponent<GridItemSpawner>();
+        
+        if (itemSpawner == null)
+        {
+            itemSpawner = gameObject.AddComponent<GridItemSpawner>();
+        }
     }
 
     public void InitializeFromLevel(LevelDefinition level)
@@ -75,6 +71,11 @@ public class GridManager : MonoBehaviour
         InitializeManagers();
         initializer.InitializeGrid();
         layoutController.UpdateLayout();
+        
+        if (level.hasCollectibles && level.winCondition is CollectItemsWinCondition)
+        {
+            itemSpawner.Initialize(state, level);
+        }
     }
 
     public void HighlightPotentialPlacement(Vector2Int position, StickData stick)

@@ -133,11 +133,6 @@ namespace StickBlast.Level
             {
                 gridManager.InitializeFromLevel(CurrentLevel);
                 
-                if (CurrentLevel.hasCollectibles)
-                {
-                    SpawnCollectibles();
-                }
-
                 var uiManager = FindObjectOfType<UIManager>();
                 if (uiManager != null)
                 {
@@ -145,23 +140,6 @@ namespace StickBlast.Level
                 }
                 
                 CurrentLevel.winCondition.Initialize();
-            }
-        }
-
-        private void SpawnCollectibles()
-        {
-            if (!CurrentLevel.hasCollectibles || CurrentLevel.collectibleSettings == null) return;
-
-            foreach (var cell in GridManager.Instance.Cells)
-            {
-                foreach (var collectible in CurrentLevel.collectibleSettings)
-                {
-                    if (Random.value < collectible.spawnChance)
-                    {
-                        cell.SetCollectible(collectible.prefab, collectible.itemType);
-                        break;
-                    }
-                }
             }
         }
 
@@ -178,6 +156,7 @@ namespace StickBlast.Level
         {
             if (CurrentLevel.winCondition is CollectItemsWinCondition collectWin)
             {
+                SoundManager.Instance.PlaySound("itemCollected");
                 collectWin.CollectItem(itemType);
             }
         }

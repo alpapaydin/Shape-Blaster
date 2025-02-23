@@ -311,9 +311,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   textMesh: {fileID: 5327034329879386298}
   popSound: {fileID: 8300000, guid: 94a576840d5376948a8584150f8d8574, type: 3}
-  typingSpeed: 0.05
+  typingSpeed: 0.02
   popScale: 2
-  popDuration: 0.1
+  popDuration: 0.05
   animator: {fileID: 8640050814525647542}
 --- !u!114 &5853874050881413550
 MonoBehaviour:

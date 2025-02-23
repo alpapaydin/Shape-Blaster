@@ -200,6 +200,12 @@ public class Cell : MonoBehaviour
             collectible = Instantiate(collectiblePrefab, transform);
             collectible.transform.localPosition = Vector3.zero;
             collectibleType = itemType;
+
+            var spriteRenderer = collectible.GetComponent<SpriteRenderer>();
+            if (spriteRenderer != null && itemType.icon != null)
+            {
+                spriteRenderer.sprite = itemType.icon;
+            }
         }
     }
 
@@ -207,15 +213,21 @@ public class Cell : MonoBehaviour
     {
         if (collectible != null)
         {
-            var winCondition = FindObjectOfType<LevelManager>().CurrentLevel.winCondition as CollectItemsWinCondition;
-            if (winCondition != null)
-            {
-                winCondition.CollectItem(collectibleType);
-                Destroy(collectible);
-                collectible = null;
-            }
+            LevelManager.Instance.CollectItem(collectibleType);
+            Destroy(collectible);
+            collectible = null;
         }
     }
+
+    public void OnClick()
+    {
+        if (HasCollectible)
+        {
+            CollectItem();
+        }
+    }
+
+    public bool HasCollectible => collectible != null;
 
     private void OnDestroy()
     {

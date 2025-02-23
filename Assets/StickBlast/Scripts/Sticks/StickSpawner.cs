@@ -94,7 +94,7 @@ public class StickSpawner : MonoBehaviour
     private IEnumerator SlideStickToPosition(RectTransform rect, Vector2 targetPos, int index)
     {
         yield return new WaitForSeconds(index * delayBetweenSticks);
-
+        SoundManager.Instance.PlaySound("swoosh");
         Vector2 startPos = rect.anchoredPosition;
         float elapsedTime = 0;
 
