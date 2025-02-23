@@ -174,6 +174,14 @@ namespace StickBlast.Level
             }
         }
 
+        public void CollectItem(ItemType itemType)
+        {
+            if (CurrentLevel.winCondition is CollectItemsWinCondition collectWin)
+            {
+                collectWin.CollectItem(itemType);
+            }
+        }
+
         public void LoadMainMenu()
         {
             SceneManager.LoadScene(menuSceneName);
