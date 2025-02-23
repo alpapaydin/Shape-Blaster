@@ -1,22 +1,33 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using TMPro;
+using StickBlast.Level;
 
 public class UIManager : MonoBehaviour
 {
-    [SerializeField] private TextMeshProUGUI progressText;
+    [SerializeField] private Transform goalPanel;
     [SerializeField] private GameObject losePopupPrefab;
     [SerializeField] private GameObject winPopupPrefab;
     
     private GameObject activeWinPopup;
     private GameObject activeLosePopup;
+    private GameObject activeGoalUI;
     private Canvas canvas;
 
     private void Start()
     {
         canvas = GetComponent<Canvas>();
         GameManager.Instance.SetUIManager(this);
+    }
+
+    public void SetupGoalUI(WinCondition winCondition)
+    {
+        if (activeGoalUI != null)
+        {
+            Destroy(activeGoalUI);
+        }
+
+        activeGoalUI = winCondition.SpawnGoalUI(goalPanel);
     }
 
     private void HideAllPopups()
@@ -42,14 +53,6 @@ public class UIManager : MonoBehaviour
         {
             activeLosePopup = Instantiate(losePopupPrefab, canvas.transform);
             SoundManager.Instance.PlaySound("lose_popup", true);
-        }
-    }
-
-    public void UpdateProgressText(string text)
-    {
-        if (progressText != null)
-        {
-            progressText.text = text;
         }
     }
 }

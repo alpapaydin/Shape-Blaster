@@ -138,13 +138,13 @@ namespace StickBlast.Level
                     SpawnCollectibles();
                 }
 
-                CurrentLevel.winCondition.Initialize();
-                
                 var uiManager = FindObjectOfType<UIManager>();
                 if (uiManager != null)
                 {
-                    uiManager.UpdateProgressText(CurrentLevel.winCondition.GetProgressText());
+                    uiManager.SetupGoalUI(CurrentLevel.winCondition);
                 }
+                
+                CurrentLevel.winCondition.Initialize();
             }
         }
 
@@ -159,7 +159,7 @@ namespace StickBlast.Level
                     if (Random.value < collectible.spawnChance)
                     {
                         cell.SetCollectible(collectible.prefab, collectible.itemType);
-                        break; // Only spawn one collectible per cell
+                        break;
                     }
                 }
             }
@@ -170,11 +170,7 @@ namespace StickBlast.Level
             if (CurrentLevel.winCondition is PointWinCondition pointWin)
             {
                 pointWin.AddPoints(points);
-                var uiManager = FindObjectOfType<UIManager>();
-                if (uiManager != null)
-                {
-                    uiManager.UpdateProgressText(CurrentLevel.winCondition.GetProgressText());
-                }
+                CurrentLevel.winCondition.UpdateProgress();
             }
         }
 

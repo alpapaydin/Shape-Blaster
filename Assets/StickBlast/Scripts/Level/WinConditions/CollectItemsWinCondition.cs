@@ -1,5 +1,7 @@
 using UnityEngine;
 using System.Collections.Generic;
+using System.Linq;
+using StickBlast.UI;
 
 namespace StickBlast.Level
 {
@@ -30,6 +32,7 @@ namespace StickBlast.Level
             if (!collectedItems.ContainsKey(itemType)) return;
             
             collectedItems[itemType]++;
+            UpdateProgress();
             if (CheckWinCondition())
             {
                 GameManager.Instance.WinGame();
@@ -62,6 +65,20 @@ namespace StickBlast.Level
                 if (i < requiredItems.Count - 1) sb.Append(", ");
             }
             return sb.ToString();
+        }
+
+        public override void UpdateProgress()
+        {
+            if (activeGoalUI == null) return;
+            
+            if (activeGoalUI is CollectibleGoalUI collectibleUI)
+            {
+                foreach (var req in requiredItems)
+                {
+                    int collected = collectedItems.ContainsKey(req.itemType) ? collectedItems[req.itemType] : 0;
+                    collectibleUI.UpdateItemProgress(req.itemType, collected, req.requiredAmount);
+                }
+            }
         }
     }
 }

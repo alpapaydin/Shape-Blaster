@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   width: 6
   height: 6
-  winCondition: {fileID: 11400000, guid: 74468a43d2195e342a0b7f5ed0a3d6e9, type: 2}
+  winCondition: {fileID: 11400000, guid: 554b92bfe36611b44a93960e4bc81344, type: 2}
   availableSticks:
   - {fileID: 11400000, guid: 522d8134b71cc954f9103d53645439ba, type: 2}
   - {fileID: 11400000, guid: a7846bba9cd02a54b8925fd2df30ec39, type: 2}
@@ -22,5 +22,4 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 7130d9c07acd4b146a5be71e0a427b06, type: 2}
   maxStickCount: 4
   hasCollectibles: 0
-  collectiblePrefab: {fileID: 0}
-  collectibleSpawnChance: 0.3
+  collectibleSettings: []
