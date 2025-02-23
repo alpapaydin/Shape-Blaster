@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using StickBlast.Level;
 
 public class GameManager : MonoBehaviour
 {
@@ -16,11 +17,12 @@ public class GameManager : MonoBehaviour
     private GameState currentState;
     private SoundManager soundManager;
     private UIManager uiManager;
+    private LevelManager levelManager;
 
     public GameState CurrentState
     {
         get => currentState;
-        private set
+        set
         {
             currentState = value;
             OnGameStateChanged();
@@ -44,7 +46,9 @@ public class GameManager : MonoBehaviour
     private void InitializeManager()
     {
         soundManager = FindObjectOfType<SoundManager>();
+        levelManager = LevelManager.Instance;
         currentState = GameState.Playing;
+        StartGame();
     }
 
     public void SetUIManager(UIManager manager)
@@ -52,10 +56,19 @@ public class GameManager : MonoBehaviour
         uiManager = manager;
     }
 
+    public void SetLevelManager(LevelManager manager)
+    {
+        levelManager = manager;
+    }
+
     public void StartGame()
     {
         CurrentState = GameState.Playing;
         soundManager.PlayBGM("bgm");
+        if (LevelManager.Instance != null)
+        {
+            LevelManager.Instance.LoadNextLevel();
+        }
     }
 
     public void WinGame()
@@ -63,15 +76,12 @@ public class GameManager : MonoBehaviour
         if (currentState != GameState.Playing) return;
         Debug.Log("You won.");
         CurrentState = GameState.Won;
-        soundManager.PlaySound("win");
     }
 
     public void LoseGame()
     {
         if (currentState != GameState.Playing) return;
-        Debug.Log("You lost.");
         CurrentState = GameState.Lost;
-        soundManager.PlaySound("lose");
     }
 
     private void OnGameStateChanged()

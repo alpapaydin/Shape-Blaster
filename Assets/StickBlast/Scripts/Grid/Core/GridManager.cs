@@ -4,9 +4,6 @@ using StickBlast.Sticks;
 
 public class GridManager : MonoBehaviour
 {
-    [Header("Grid Settings")]
-    [SerializeField] private int width = 6;
-    [SerializeField] private int height = 6;
     
     [Header("Prefabs")]
     [SerializeField] private GameObject dotPrefab;
@@ -33,6 +30,9 @@ public class GridManager : MonoBehaviour
     private BlastManager blastManager;
     private PlacementManager placementManager;
     private GridValidator validator;
+    
+    private int width = 6;
+    private int height = 6;
 
     private void Awake()
     {
@@ -41,16 +41,11 @@ public class GridManager : MonoBehaviour
 
     private void Start()
     {
-        initializer.InitializeGrid();
-        layoutController.UpdateLayout();
-
         if (enableDebugPattern)
         {
             var debugger = new GridDebugger(state, connectionManager, cellManager);
             debugger.FillTestPattern();
         }
-
-        GameManager.Instance.StartGame();
     }
 
     private void OnRectTransformDimensionsChange()
@@ -70,6 +65,15 @@ public class GridManager : MonoBehaviour
         validator = new GridValidator(state, connectionManager);
         placementManager = new PlacementManager(state, validator, connectionManager, cellManager, blastManager);
         blastManager = new BlastManager(state, connectionManager, cellManager);
+    }
+
+    public void InitializeFromLevel(LevelDefinition level)
+    {
+        width = level.width;
+        height = level.height;
+        InitializeManagers();
+        initializer.InitializeGrid();
+        layoutController.UpdateLayout();
     }
 
     public void HighlightPotentialPlacement(Vector2Int position, StickData stick)

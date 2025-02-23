@@ -1,0 +1,25 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: baa34ac5dcbd5a440b7e19c36e6d375b, type: 3}
+  m_Name: Level1
+  m_EditorClassIdentifier: 
+  width: 4
+  height: 4
+  winCondition: {fileID: 11400000, guid: 74468a43d2195e342a0b7f5ed0a3d6e9, type: 2}
+  availableSticks:
+  - {fileID: 11400000, guid: 7130d9c07acd4b146a5be71e0a427b06, type: 2}
+  - {fileID: 11400000, guid: 522d8134b71cc954f9103d53645439ba, type: 2}
+  - {fileID: 11400000, guid: a7846bba9cd02a54b8925fd2df30ec39, type: 2}
+  maxStickCount: 3
+  hasCollectibles: 0
+  collectiblePrefab: {fileID: 0}
+  collectibleSpawnChance: 0.3

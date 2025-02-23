@@ -1,5 +1,6 @@
 using UnityEngine;
 using System.Collections;
+using StickBlast.Level;
 
 public class Cell : MonoBehaviour
 {
@@ -18,6 +19,7 @@ public class Cell : MonoBehaviour
     private Color currentColor;
     private Color fillColor;
     private Color blastColor;
+    private GameObject collectible;
 
     private void Awake()
     {
@@ -178,6 +180,29 @@ public class Cell : MonoBehaviour
             GameObject effect = Instantiate(blastEffectPrefab, position, Quaternion.identity);
             effect.transform.localScale = Vector3.Scale(effect.transform.localScale, scale);
             effect.GetComponent<BlastEffect>()?.SetDirection(isVertical);
+        }
+    }
+
+    public void SpawnCollectible(GameObject collectiblePrefab)
+    {
+        if (collectible == null && !isComplete)
+        {
+            collectible = Instantiate(collectiblePrefab, transform);
+            collectible.transform.localPosition = Vector3.zero;
+        }
+    }
+
+    public void CollectItem()
+    {
+        if (collectible != null)
+        {
+            var winCondition = FindObjectOfType<LevelManager>().CurrentLevel.winCondition as CollectItemsWinCondition;
+            if (winCondition != null)
+            {
+                winCondition.CollectItem();
+                Destroy(collectible);
+                collectible = null;
+            }
         }
     }
 

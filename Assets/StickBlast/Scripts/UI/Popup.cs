@@ -1,6 +1,6 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
-
+using StickBlast.Level;
 public class Popup : MonoBehaviour
 {
     [SerializeField] private AudioClip thudClip;
@@ -16,11 +16,10 @@ public class Popup : MonoBehaviour
 
     public void PlayThud() { audioSource.PlayOneShot(thudClip); }
     public void PlayLose() { audioSource.PlayOneShot(loseClip); }
-    public void GoToMainMenu() { //Game.Manager.OpenMainMenu();
-                                 }
+    public void GoToMainMenu() { LevelManager.Instance.LoadMainMenu(); }
     public void RestartLevel()
     {
         audioSource.PlayOneShot(tapClip);
-        //Game.Manager.StartGame();
+        LevelManager.Instance.RestartLevel();
     }
 }
