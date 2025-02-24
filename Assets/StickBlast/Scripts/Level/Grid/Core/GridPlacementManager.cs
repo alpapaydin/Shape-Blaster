@@ -17,6 +17,8 @@ namespace StickBlast.Grid
 
         private List<Vector2Int> lastCompletedCells;
         private HashSet<Vector2Int> lastBlastCells;
+        private Vector2Int lastOrigin;
+        private bool showingHighlight;
         private const float MIN_HIGHLIGHT_DISTANCE = 0.05f;
 
         public PlacementManager(GridState state, GridValidator validator, ConnectionManager connectionManager, 
@@ -31,15 +33,24 @@ namespace StickBlast.Grid
 
         public void HighlightPotentialPlacement(Vector2Int origin, StickData stick)
         {
-            bool wasValid = validator.CanPlaceStick(origin, stick, CalculateStickCenterOffset(stick));
-            ClearHighlights();
-
-            if (!wasValid)
+            bool isValid = validator.CanPlaceStick(origin, stick, CalculateStickCenterOffset(stick));
+            
+            if (!isValid)
             {
+                if (showingHighlight)
+                {
+                    ClearHighlights();
+                }
                 SoundManager.Instance.FadeOutSound("highlightBlast");
                 return;
             }
 
+            if (showingHighlight && lastOrigin != origin)
+            {
+                ClearHighlights();
+            }
+
+            lastOrigin = origin;
             Vector2 centerOffset = CalculateStickCenterOffset(stick);
             HighlightValidConnections(origin, stick, centerOffset);
             ShowCompletionPreviews(origin, stick, centerOffset);
@@ -47,6 +58,7 @@ namespace StickBlast.Grid
 
         private void HighlightValidConnections(Vector2Int origin, StickData stick, Vector2 centerOffset)
         {
+            showingHighlight = true;
             Color transparentThemeColor = state.ThemeColor;
             transparentThemeColor.a = 0.6f;
 
@@ -276,6 +288,8 @@ namespace StickBlast.Grid
 
         public void ClearHighlights()
         {
+            showingHighlight = false;
+            
             for (int x = 0; x < state.Width; x++)
             {
                 for (int y = 0; y < state.Height; y++)
