@@ -9,6 +9,7 @@ public class Cell : MonoBehaviour
     [SerializeField] private Material blastPreviewMaterialPrefab;
     [SerializeField] private Material blastInnerMaterialPrefab;
     [SerializeField] private GameObject blastEffectPrefab;
+    [SerializeField] private GameObject blastParticlePrefab;
     [SerializeField] private SpriteRenderer outerGlowRenderer;
     private SpriteRenderer mainRenderer;
     private bool isComplete;
@@ -165,6 +166,26 @@ public class Cell : MonoBehaviour
     {
         ResetGlowMaterial();
         SwapToFillMaterial();
+    }
+
+    public void CellBlasted()
+    {
+        SetComplete(false);
+        CollectItem();
+        if (blastParticlePrefab != null)
+        {
+            Vector3 position = transform.position;
+            position.z = -0.1f;
+            
+            GameObject particle = Instantiate(blastParticlePrefab, position, Quaternion.identity);
+            var particleSystem = particle.GetComponent<ParticleSystem>();
+            if (particleSystem != null)
+            {
+                var main = particleSystem.main;
+                main.startColor = GridManager.Instance.GetThemeColor();
+                particleSystem.Play();
+            }
+        }
     }
 
     public void ShowBlastVisual(bool isVertical, Vector3 scale)

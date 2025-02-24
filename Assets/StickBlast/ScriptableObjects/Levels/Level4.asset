@@ -18,8 +18,10 @@ MonoBehaviour:
   availableSticks:
   - {fileID: 11400000, guid: 522d8134b71cc954f9103d53645439ba, type: 2}
   - {fileID: 11400000, guid: a7846bba9cd02a54b8925fd2df30ec39, type: 2}
-  - {fileID: 11400000, guid: cfa5a52933191f84c96cbbab36edca94, type: 2}
+  - {fileID: 11400000, guid: c36f6214f5d46094996484424cd64cc9, type: 2}
   - {fileID: 11400000, guid: 7130d9c07acd4b146a5be71e0a427b06, type: 2}
   - {fileID: 11400000, guid: c6b62e813435f8747a46ccba1c8398c8, type: 2}
+  - {fileID: 11400000, guid: 940c5bd90455ba24ba6db2f2d2eed7bf, type: 2}
+  - {fileID: 11400000, guid: a71f52b9e338c2d48a17278ca211e7a3, type: 2}
   maxStickCount: 3
   hasCollectibles: 1

@@ -89,8 +89,7 @@ namespace StickBlast.Grid
                     var cell = state.Cells[cellPos.x, cellPos.y];
                     if (cell != null)
                     {
-                        cell.SetComplete(false);
-                        cell.CollectItem();
+                        cell.CellBlasted();
                     }
                 }
             }

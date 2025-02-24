@@ -1,0 +1,35 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ca7a0cd9ea5dd86478d07115c6acf7fb, type: 3}
+  m_Name: IIx2
+  m_EditorClassIdentifier: 
+  stickName: 
+  shape: 7
+  segments:
+  - start: {x: 0, y: 0}
+    end: {x: 0, y: 1}
+  - start: {x: 0, y: 1}
+    end: {x: 0, y: 2}
+  - start: {x: 1, y: 0}
+    end: {x: 1, y: 1}
+  - start: {x: 1, y: 1}
+    end: {x: 1, y: 2}
+  stickParts:
+  - sprite: {fileID: 21300000, guid: bd51ab429ced5c34c9865193767922db, type: 3}
+    relativePosition: {x: 0, y: 0}
+  - sprite: {fileID: 21300000, guid: efb5d92714bc7924eb06e879e442ece9, type: 3}
+    relativePosition: {x: 0, y: 290}
+  - sprite: {fileID: 21300000, guid: 9d1990553a4648b439436f1dd4316162, type: 3}
+    relativePosition: {x: 215, y: 0}
+  - sprite: {fileID: 21300000, guid: a4f7e521a84ba4f46832e1f959e6f69c, type: 3}
+    relativePosition: {x: 215, y: 290}
+  scaleMultiplier: 5

@@ -140,6 +140,12 @@ namespace StickBlast.Level
                     uiManager.SetupGoalUI(CurrentLevel.winCondition);
                 }
                 
+                var stickSpawner = FindObjectOfType<StickSpawner>();
+                if (stickSpawner != null)
+                {
+                    stickSpawner.InitializeFromLevel(CurrentLevel);
+                }
+                
                 CurrentLevel.winCondition.Initialize();
             }
         }

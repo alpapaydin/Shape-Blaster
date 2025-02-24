@@ -49,7 +49,7 @@ Material:
     - _FillAmount: 1
     - _FlowSpeed: 1.086
     - _GlobalTime: 0
-    - _GlowIntensity: 3
+    - _GlowIntensity: 6.31
     - _GlowRadius: 0.586
     - _NoiseScale: 4.05
     - _ParticleCount: 10

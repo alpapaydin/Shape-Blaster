@@ -1,31 +1,31 @@
 using UnityEngine;
 using UnityEngine.UI;
 using StickBlast.Sticks;
+using StickBlast.Level;
 using System.Collections;
 
 public class StickSpawner : MonoBehaviour
 {
     [SerializeField] private GameObject stickUIPrefab;
     [SerializeField] private Transform stickContainer;
-    [SerializeField] private int maxSticks = 3;
     [SerializeField] private Canvas canvas;
-    [SerializeField] private StickDefinition[] availableSticks;
     [SerializeField] private float previewScaleMultiplier = 0.5f;
     [SerializeField] private float dragScaleMultiplier = 1f;
     [SerializeField] private float slideInDuration = 0.5f;
     [SerializeField] private float delayBetweenSticks = 0.2f;
 
+    private int maxSticks = 3;
+    private StickDefinition[] availableSticks;
     private Vector2[] slotPositions;
     private bool[] occupiedSlots;
-    private GridManager gridManager;
 
-    private void Start()
+    public void InitializeFromLevel(LevelDefinition level)
     {
-        gridManager = FindObjectOfType<GridManager>();
+        availableSticks = level.availableSticks;
+        maxSticks = level.maxStickCount;
+        
         slotPositions = new Vector2[maxSticks];
         occupiedSlots = new bool[maxSticks];
-
-        RectTransform containerRect = (RectTransform)stickContainer;
         
         CalculateSlotPositions();
         SpawnInitialSticks();
@@ -163,7 +163,7 @@ public class StickSpawner : MonoBehaviour
         
         foreach (var stickDraggable in activeSticks)
         {
-            if (gridManager.CanStickBePlacedAnywhere(stickDraggable.StickData))
+            if (GridManager.Instance.CanStickBePlacedAnywhere(stickDraggable.StickData))
             {
                 return false;
             }
@@ -195,7 +195,7 @@ public class StickSpawner : MonoBehaviour
     public void CheckGameOver(StickDraggable currentStick)
     {
         var activeSticks = GetComponentsInChildren<StickDraggable>();
-        if (gridManager.CanStickBePlacedAnywhere(currentStick.StickData))
+        if (GridManager.Instance.CanStickBePlacedAnywhere(currentStick.StickData))
             return;
 
         foreach (var stick in activeSticks)
@@ -203,7 +203,7 @@ public class StickSpawner : MonoBehaviour
             if (stick == currentStick) 
                 continue;
             
-            if (gridManager.CanStickBePlacedAnywhere(stick.StickData))
+            if (GridManager.Instance.CanStickBePlacedAnywhere(stick.StickData))
                 return;
         }
         Vibration.VibrateHeavy();

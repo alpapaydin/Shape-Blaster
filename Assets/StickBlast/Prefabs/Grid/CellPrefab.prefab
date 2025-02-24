@@ -106,6 +106,7 @@ MonoBehaviour:
   blastPreviewMaterialPrefab: {fileID: 2100000, guid: 142bbca21ee1c0348bfd35499f2d058d, type: 2}
   blastInnerMaterialPrefab: {fileID: 2100000, guid: 801b334fe4a068a4d94719077a96084e, type: 2}
   blastEffectPrefab: {fileID: 4073973658897037531, guid: 348c41e3a9ffce845bb7146247a313f7, type: 3}
+  blastParticlePrefab: {fileID: 0}
   outerGlowRenderer: {fileID: 9157121840131941264}
   fillDuration: 0.5
 --- !u!1 &3740594116881418703

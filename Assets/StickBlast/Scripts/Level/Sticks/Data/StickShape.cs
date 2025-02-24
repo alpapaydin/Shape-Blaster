@@ -8,6 +8,8 @@ namespace StickBlast.Sticks
         L_2X,
         U_1X,
         U_2X,
-        Q_2X
+        Q_2X,
+        II_2X,
+        L_3X
     }
 }
