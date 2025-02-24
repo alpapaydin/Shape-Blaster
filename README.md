@@ -21,8 +21,6 @@ Made with Unity 2022.3.25f1
 
 The project is organized into several key modules:
 
-## Technical Structure
-
 - **Core Gameplay Management**  
   - The [`GameManager`](Assets/StickBlast/Scripts/Core/GameManager.cs) class manages the overall game state (Playing, Won, Lost), plays background music using `SoundManager`, and handles UI updates via [`UIManager`](Assets/StickBlast/Scripts/UI/Gameplay/).
 
