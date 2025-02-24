@@ -118,29 +118,6 @@ public class StickSpawner : MonoBehaviour
         }
     }
 
-    private float BounceEaseOut(float t)
-    {
-        if (t < 1f/2.75f)
-        {
-            return 7.5625f * t * t;
-        }
-        else if (t < 2f/2.75f)
-        {
-            t -= 1.5f/2.75f;
-            return 7.5625f * t * t + 0.75f;
-        }
-        else if (t < 2.5f/2.75f)
-        {
-            t -= 2.25f/2.75f;
-            return 7.5625f * t * t + 0.9375f;
-        }
-        else
-        {
-            t -= 2.625f/2.75f;
-            return 7.5625f * t * t + 0.984375f;
-        }
-    }
-
     private StickData GetRandomStickData()
     {
         if (availableSticks == null || availableSticks.Length == 0)
@@ -207,6 +184,30 @@ public class StickSpawner : MonoBehaviour
                 return;
         }
         Vibration.VibrateHeavy();
+        currentStick.ShouldCancelDrag = true;
         GameManager.Instance.LoseGame();
+    }
+    
+    private float BounceEaseOut(float t)
+    {
+        if (t < 1f/2.75f)
+        {
+            return 7.5625f * t * t;
+        }
+        else if (t < 2f/2.75f)
+        {
+            t -= 1.5f/2.75f;
+            return 7.5625f * t * t + 0.75f;
+        }
+        else if (t < 2.5f/2.75f)
+        {
+            t -= 2.25f/2.75f;
+            return 7.5625f * t * t + 0.9375f;
+        }
+        else
+        {
+            t -= 2.625f/2.75f;
+            return 7.5625f * t * t + 0.984375f;
+        }
     }
 }

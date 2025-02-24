@@ -32,6 +32,7 @@ public class StickDraggable : MonoBehaviour, IBeginDragHandler, IDragHandler, IE
     private float minDragDistance = 1f;
 
     public StickData StickData => stickData;
+    public bool ShouldCancelDrag;
     
     private void Awake()
     {
@@ -100,7 +101,11 @@ public class StickDraggable : MonoBehaviour, IBeginDragHandler, IDragHandler, IE
     public void OnDrag(PointerEventData eventData)
     {
         if (!isDragging) return;
-        
+        if (ShouldCancelDrag)
+        {
+            CancelDrag(eventData);
+            return;
+        }
         Vector2 touchPos;
         if (RectTransformUtility.ScreenPointToLocalPointInRectangle(
             (RectTransform)transform.parent,
@@ -116,6 +121,13 @@ public class StickDraggable : MonoBehaviour, IBeginDragHandler, IDragHandler, IE
                 lastDragPosition = eventData.position;
             }
         }
+    }
+
+    private void CancelDrag(PointerEventData eventData)
+    {
+        OnEndDrag(eventData);
+        eventData.pointerDrag = null;
+        eventData.Use();
     }
 
     private void UpdateDragPosition(PointerEventData eventData)
