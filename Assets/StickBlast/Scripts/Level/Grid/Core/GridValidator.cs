@@ -64,27 +64,31 @@ namespace StickBlast.Grid
 
         public bool CanStickBePlacedAnywhere(StickData stick)
         {
+            Vector2 centerOffset = CalculateStickCenterOffset(stick);
+            Vector2Int intCenterOffset = Vector2Int.RoundToInt(centerOffset);
+
             Vector2Int min = new Vector2Int(int.MaxValue, int.MaxValue);
             Vector2Int max = new Vector2Int(int.MinValue, int.MinValue);
 
             foreach (var segment in stick.segments)
             {
-                min.x = Mathf.Min(min.x, Mathf.Min(segment.start.x, segment.end.x));
-                min.y = Mathf.Min(min.y, Mathf.Min(segment.start.y, segment.end.y));
-                max.x = Mathf.Max(max.x, Mathf.Max(segment.start.x, segment.end.x));
-                max.y = Mathf.Max(max.y, Mathf.Max(segment.start.y, segment.end.y));
+                Vector2Int start = segment.start - intCenterOffset;
+                Vector2Int end = segment.end - intCenterOffset;
+
+                min.x = Mathf.Min(min.x, Mathf.Min(start.x, end.x));
+                min.y = Mathf.Min(min.y, Mathf.Min(start.y, end.y));
+                max.x = Mathf.Max(max.x, Mathf.Max(start.x, end.x));
+                max.y = Mathf.Max(max.y, Mathf.Max(start.y, end.y));
             }
 
             int startX = Mathf.Max(0, -min.x);
-            int endX = Mathf.Min(state.Width - 1, state.Width - max.x);
+            int endX = Mathf.Min(state.Width - 1, state.Width - 1 - max.x);
             int startY = Mathf.Max(0, -min.y);
-            int endY = Mathf.Min(state.Height - 1, state.Height - max.y);
+            int endY = Mathf.Min(state.Height - 1, state.Height - 1 - max.y);
 
             if (startX > endX || startY > endY)
                 return false;
 
-            Vector2 centerOffset = CalculateStickCenterOffset(stick);
-            
             for (int x = startX; x <= endX; x++)
             {
                 for (int y = startY; y <= endY; y++)
