@@ -15,6 +15,10 @@ namespace StickBlast.Grid
 
         private HashSet<Vector2Int> currentBlastPreviewCells = new HashSet<Vector2Int>();
 
+        private List<Vector2Int> lastCompletedCells;
+        private HashSet<Vector2Int> lastBlastCells;
+        private const float MIN_HIGHLIGHT_DISTANCE = 0.05f;
+
         public PlacementManager(GridState state, GridValidator validator, ConnectionManager connectionManager, 
                               CellManager cellManager, BlastManager blastManager)
         {
@@ -139,38 +143,30 @@ namespace StickBlast.Grid
         private void ShowCompletionPreviews(Vector2Int origin, StickData stick, Vector2 centerOffset)
         {
             var completedCells = SimulatePlacement(origin, stick, centerOffset);
+            
+            if (lastCompletedCells != null && 
+                completedCells.Count == lastCompletedCells.Count && 
+                completedCells.TrueForAll(c => lastCompletedCells.Contains(c)))
+            {
+                if (lastBlastCells != null && lastBlastCells.Count > 0)
+                {
+                    foreach (var cellPos in lastBlastCells)
+                    {
+                        cellManager.ShowBlastPreview(cellPos);
+                    }
+                    SoundManager.Instance.TryPlaySound("highlightBlast");
+                    return;
+                }
+            }
+
+            lastCompletedCells = completedCells;
+            
             if (completedCells.Count > 0)
             {
                 var simulatedState = new HashSet<Vector2Int>(completedCells);
-                var blastCells = new HashSet<Vector2Int>();
+                var blastCells = CalculateBlastCells(simulatedState);
                 
-                for (int y = 0; y < state.Height - 1; y++)
-                {
-                    int completedInRow = cellManager.GetCompletedCellsInRow(y);
-                    int wouldBeCompletedInRow = simulatedState.Where(c => c.y == y).Count();
-                    
-                    if (completedInRow + wouldBeCompletedInRow >= state.Width - 1)
-                    {
-                        for (int x = 0; x < state.Width - 1; x++)
-                        {
-                            blastCells.Add(new Vector2Int(x, y));
-                        }
-                    }
-                }
-
-                for (int x = 0; x < state.Width - 1; x++)
-                {
-                    int completedInCol = cellManager.GetCompletedCellsInColumn(x);
-                    int wouldBeCompletedInCol = simulatedState.Where(c => c.x == x).Count();
-
-                    if (completedInCol + wouldBeCompletedInCol >= state.Height - 1)
-                    {
-                        for (int y = 0; y < state.Height - 1; y++)
-                        {
-                            blastCells.Add(new Vector2Int(x, y));
-                        }
-                    }
-                }
+                lastBlastCells = blastCells;
 
                 foreach (var cellPos in blastCells)
                 {
@@ -184,8 +180,56 @@ namespace StickBlast.Grid
             }
             else
             {
+                lastBlastCells = null;
                 SoundManager.Instance.FadeOutSound("highlightBlast");
             }
+        }
+
+        private HashSet<Vector2Int> CalculateBlastCells(HashSet<Vector2Int> simulatedState)
+        {
+            var blastCells = new HashSet<Vector2Int>();
+
+            var rowCompletions = new int[state.Height - 1];
+            var colCompletions = new int[state.Width - 1];
+
+            for (int y = 0; y < state.Height - 1; y++)
+            {
+                rowCompletions[y] = cellManager.GetCompletedCellsInRow(y);
+            }
+            for (int x = 0; x < state.Width - 1; x++)
+            {
+                colCompletions[x] = cellManager.GetCompletedCellsInColumn(x);
+            }
+
+            foreach (var cell in simulatedState)
+            {
+                rowCompletions[cell.y]++;
+                colCompletions[cell.x]++;
+            }
+
+            for (int y = 0; y < state.Height - 1; y++)
+            {
+                if (rowCompletions[y] >= state.Width - 1)
+                {
+                    for (int x = 0; x < state.Width - 1; x++)
+                    {
+                        blastCells.Add(new Vector2Int(x, y));
+                    }
+                }
+            }
+
+            for (int x = 0; x < state.Width - 1; x++)
+            {
+                if (colCompletions[x] >= state.Height - 1)
+                {
+                    for (int y = 0; y < state.Height - 1; y++)
+                    {
+                        blastCells.Add(new Vector2Int(x, y));
+                    }
+                }
+            }
+
+            return blastCells;
         }
 
         private List<Vector2Int> SimulatePlacement(Vector2Int origin, StickData stick, Vector2 centerOffset)

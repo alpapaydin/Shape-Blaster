@@ -24,11 +24,12 @@ public class StickDraggable : MonoBehaviour, IBeginDragHandler, IDragHandler, IE
     private Camera dragCamera;
     private RectTransform partsContainerRect;
     private Vector2 weightedCenterCache;
-    private float updateHighlightThreshold = 0.03f;
     private Vector2 lastHighlightPosition;
     [SerializeField] private bool useVibration = true;
     [SerializeField] private Material stickMaterial;
     private Vector2 slotPosition;
+    private Vector2 lastDragPosition;
+    private float minDragDistance = 1f;
 
     public StickData StickData => stickData;
     
@@ -109,10 +110,10 @@ public class StickDraggable : MonoBehaviour, IBeginDragHandler, IDragHandler, IE
         {
             rectTransform.anchoredPosition = touchPos - GetRotatedOffset() + touchOffset;
             
-            if (Vector2.Distance(lastHighlightPosition, touchPos) > updateHighlightThreshold)
+            if (Vector2.Distance(eventData.position, lastDragPosition) > minDragDistance)
             {
                 UpdateGridHighlight();
-                lastHighlightPosition = touchPos;
+                lastDragPosition = eventData.position;
             }
         }
     }

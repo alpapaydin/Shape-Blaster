@@ -119,7 +119,7 @@ public class GridManager : MonoBehaviour
         Vector3 localPos = transform.InverseTransformPoint(worldPosition);
         return new Vector2Int(
             Mathf.RoundToInt(localPos.x + (width - 1) * 0.5f),
-            Mathf.RoundToInt(localPos.y + (height - 1) * 0.5f)
+            Mathf.RoundToInt(localPos.y + (height - 1) * 0.51f)
         );
     }
 
