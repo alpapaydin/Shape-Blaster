@@ -12,8 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: baa34ac5dcbd5a440b7e19c36e6d375b, type: 3}
   m_Name: Level1
   m_EditorClassIdentifier: 
-  width: 4
-  height: 4
+  width: 5
+  height: 5
   winCondition: {fileID: 11400000, guid: 74468a43d2195e342a0b7f5ed0a3d6e9, type: 2}
   availableSticks:
   - {fileID: 11400000, guid: 7130d9c07acd4b146a5be71e0a427b06, type: 2}
@@ -21,4 +21,3 @@ MonoBehaviour:
   - {fileID: 11400000, guid: a7846bba9cd02a54b8925fd2df30ec39, type: 2}
   maxStickCount: 3
   hasCollectibles: 0
-  collectibleSettings: []

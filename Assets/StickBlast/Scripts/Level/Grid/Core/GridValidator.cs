@@ -64,8 +64,8 @@ namespace StickBlast.Grid
 
         public bool CanStickBePlacedAnywhere(StickData stick)
         {
-            Vector2Int min = Vector2Int.zero;
-            Vector2Int max = Vector2Int.zero;
+            Vector2Int min = new Vector2Int(int.MaxValue, int.MaxValue);
+            Vector2Int max = new Vector2Int(int.MinValue, int.MinValue);
 
             foreach (var segment in stick.segments)
             {
